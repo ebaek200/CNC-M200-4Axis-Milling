@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CNC-M200 Procurement & Assembly Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--card:#1c2128;--card-h:#242a33;--border:#30363d;
+  --t1:#c9d1d9;--t2:#8b949e;--th:#e6edf3;--bright:#f0f6fc;
+  --blue:#58a6ff;--green:#7ee787;--orange:#f0883e;--purple:#bc8cff;
+  --yellow:#e3b341;--cyan:#79c0ff;--red:#f85149;
+  --font:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);line-height:1.7;font-size:15px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding:40px 24px 60px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+.back{color:var(--t2);font-size:0.9rem}
+.back:hover{color:var(--blue);text-decoration:none}
+h1{color:var(--th);font-size:2rem;margin:12px 0 4px}
+h1 span{color:var(--blue)}
+.sub{color:var(--t2);font-size:0.95rem;margin-bottom:32px}
+.badge{display:inline-flex;font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:16px;margin-right:6px}
+.badge-b{color:var(--blue);background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.25)}
+.badge-g{color:var(--green);background:rgba(126,231,135,0.12);border:1px solid rgba(126,231,135,0.25)}
+.badge-o{color:var(--orange);background:rgba(240,136,62,0.12);border:1px solid rgba(240,136,62,0.25)}
+
+/* Section titles */
+.sec{margin:48px 0 20px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.sec h2{font-size:1.3rem;color:var(--blue);font-weight:700}
+.sec p{color:var(--t2);font-size:0.85rem;margin-top:4px}
+
+/* Assembly Steps */
+.steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:16px}
+.step{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;transition:all 0.2s}
+.step:hover{border-color:var(--blue);background:var(--card-h)}
+.step-num{width:28px;height:28px;border-radius:50%;background:rgba(88,166,255,0.15);color:var(--blue);font-size:0.8rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.step-title{font-size:0.9rem;font-weight:700;color:var(--th);margin-bottom:4px}
+.step-desc{font-size:0.78rem;color:var(--t2);line-height:1.5}
+.step-parts{font-size:0.72rem;color:var(--cyan);margin-top:6px;font-weight:600}
+
+/* Category header */
+.cat{margin:28px 0 8px;padding:12px 18px;background:var(--card);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:12px}
+.cat-id{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:800}
+.cat-name{font-size:0.95rem;font-weight:700;color:var(--th);flex:1}
+.cat-cnt{font-size:0.78rem;color:var(--t2)}
+
+/* Purchase table */
+.ptbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:4px}
+.ptbl th{background:var(--bg3);color:var(--cyan);font-weight:600;padding:8px 12px;text-align:left;border:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap}
+.ptbl td{padding:8px 12px;border:1px solid var(--border);vertical-align:middle}
+.ptbl tr:hover td{background:var(--card-h)}
+.ptbl .c{text-align:center}
+.ptbl .name{font-weight:600;color:var(--th);font-size:0.85rem}
+.ptbl .spec{color:var(--t2);font-size:0.78rem}
+.ptbl .vendor{font-size:0.78rem}
+.ptbl .vendor a{color:var(--green);font-weight:600}
+.ptbl .vendor .alt{color:var(--t2);font-size:0.72rem;display:block;margin-top:2px}
+.ptbl .cad{font-size:0.75rem}
+.ptbl .cad a{color:var(--orange);font-weight:600}
+.ptbl .cad .src{color:var(--t2);font-size:0.7rem}
+
+/* 3D CAD section */
+.cad-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.cad-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:center;transition:all 0.2s}
+.cad-card:hover{background:var(--card-h);border-color:#484f58}
+.cad-icon{width:36px;height:36px;border-radius:8px;background:rgba(240,136,62,0.12);color:var(--orange);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:800;flex-shrink:0}
+.cad-info{flex:1;min-width:0}
+.cad-name{font-size:0.85rem;font-weight:700;color:var(--th)}
+.cad-src{font-size:0.75rem;color:var(--t2)}
+.cad-link{font-size:0.75rem;color:var(--orange);font-weight:600}
+
+/* Note box */
+.note{background:rgba(88,166,255,0.06);border:1px solid rgba(88,166,255,0.2);border-radius:10px;padding:16px 20px;margin:20px 0;font-size:0.85rem;color:var(--t1)}
+.note strong{color:var(--blue)}
+
+.footer{text-align:center;color:var(--t2);font-size:0.8rem;margin-top:48px;padding-top:20px;border-top:1px solid var(--border)}
+
+@media(max-width:768px){
+  .ptbl{font-size:11px}
+  .ptbl th,.ptbl td{padding:6px 8px}
+  .steps{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  .steps{grid-template-columns:1fr}
+  .ptbl{display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<a href="/cnc-milling.html" class="back">&larr; CNC-M200 Design Doc</a>
+<div style="margin:12px 0 8px">
+  <span class="badge badge-b">PROCUREMENT</span>
+  <span class="badge badge-g">ASSEMBLY</span>
+  <span class="badge badge-o">3D CAD</span>
+</div>
+<h1>CNC-M200 <span>Purchase & Assembly Guide</span></h1>
+<p class="sub">4-Axis Milling Machine &mdash; 51개 부품 구매처 + 조립 순서 + 3D CAD 다운로드</p>
+
+<!-- ══════════════════════════════════════════════
+     ASSEMBLY SEQUENCE
+     ══════════════════════════════════════════════ -->
+<div class="sec">
+  <h2>Assembly Sequence &mdash; 조립 순서</h2>
+  <p>아래 순서대로 조립합니다. 각 단계에서 사용하는 주요 부품을 표시했습니다.</p>
+</div>
+
+<div class="steps">
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-title">프레임 조립</div>
+    <div class="step-desc">베이스 플레이트에 좌/우 컬럼, 후면벽, 상부 플레이트 볼트 체결. 거셋으로 강성 보강. 레벨링 발 설치.</div>
+    <div class="step-parts">P1~P9, 거셋, 다웰핀, 레벨링 발</div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-title">Y축 리니어 설치</div>
+    <div class="step-desc">베이스 위에 HGR20 Y레일 2개 설치 → HGH20CA 블록 4개 장착 → Y축 새들 플레이트 올려 블록에 체결.</div>
+    <div class="step-parts">HGR20&times;2, HGH20CA&times;4, 새들 플레이트</div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-title">X축 리니어 설치</div>
+    <div class="step-desc">Y축 새들 위에 HGR20 X레일 2개 설치 → 블록 4개 → T-슬롯 테이블 체결.</div>
+    <div class="step-parts">HGR20&times;2, HGH20CA&times;4, T-슬롯 테이블</div>
+  </div>
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-title">볼스크류 설치</div>
+    <div class="step-desc">X/Y축 볼스크류 각각 설치. BK12(고정단) + BF12(자유단) 베어링 블록 장착. DSG16H 너트 하우징 체결.</div>
+    <div class="step-parts">SFU1605&times;3, BK12&times;3, BF12&times;3, DSG16H&times;3</div>
+  </div>
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-title">Z축 리니어 + 볼스크류</div>
+    <div class="step-desc">후면벽에 Z축 HGR20 레일 2개 수직 설치 → 블록 4개 → Z축 헤드 플레이트 장착 → Z축 볼스크류 설치.</div>
+    <div class="step-parts">HGR20&times;2, HGH20CA&times;4, 헤드 플레이트</div>
+  </div>
+  <div class="step">
+    <div class="step-num">6</div>
+    <div class="step-title">모터 + 커플링 장착</div>
+    <div class="step-desc">XYZ 3축에 NEMA23 모터 설치. 스파이더 커플링으로 모터축-볼스크류 연결. 축 정렬 확인.</div>
+    <div class="step-parts">NEMA23&times;3, 커플링 8&times;10 &times;3</div>
+  </div>
+  <div class="step">
+    <div class="step-num">7</div>
+    <div class="step-title">스핀들 시스템</div>
+    <div class="step-desc">Z축 헤드에 스핀들 클램프 65mm 장착 → 수냉 스핀들 1kW 삽입 → VFD 인버터 연결 → 수냉 펌프 + 호스 배관.</div>
+    <div class="step-parts">스핀들 1kW, 클램프, VFD, 수중펌프, ER11</div>
+  </div>
+  <div class="step">
+    <div class="step-num">8</div>
+    <div class="step-title">4축 로터리 (옵션)</div>
+    <div class="step-desc">T-슬롯 테이블에 4축 로터리 헤드(K11-100) 고정 → 심압대 반대편 고정 → A축 NEMA23 모터 장착.</div>
+    <div class="step-parts">K11-100, 심압대 MT2, NEMA23 A축</div>
+  </div>
+  <div class="step">
+    <div class="step-num">9</div>
+    <div class="step-title">전자부 배선</div>
+    <div class="step-desc">grblHAL 보드 + DM556 드라이버 4개 + PSU(48V+24V) 배선. 74HCT245 레벨시프터 연결. 근접센서, 비상정지, SSR 배선.</div>
+    <div class="step-parts">grblHAL, DM556&times;4, RSP-750-48, MDR-60-24</div>
+  </div>
+  <div class="step">
+    <div class="step-num">10</div>
+    <div class="step-title">마무리 + 테스트</div>
+    <div class="step-desc">케이블 체인 설치 → GX16 커넥터 배선 정리 → 리미트 센서 동작 확인 → 트래밍(평행도) → 테스트 절삭.</div>
+    <div class="step-parts">케이블 체인, GX16, 다이얼 인디케이터</div>
+  </div>
+</div>
+
+<div class="note">
+  <strong>Tip:</strong> 프레임(Step 1) 완성 후 리니어 레일은 반드시 Y&rarr;X&rarr;Z 순서로 설치합니다. 볼스크류는 레일 설치 후에 장착해야 정렬이 정확합니다. 전자부 배선은 기구부가 완전히 끝난 후 진행하세요.
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PARTS PROCUREMENT TABLE
+     ══════════════════════════════════════════════ -->
+<div class="sec">
+  <h2>Parts Procurement &mdash; 부품별 구매처</h2>
+  <p>부품을 클릭하면 해당 구매처 검색 페이지가 열립니다. 3D CAD 링크는 GrabCAD (무료 계정 필요) 또는 공식 사이트입니다.</p>
+</div>
+
+<!-- A. 기구부 -->
+<div class="cat">
+  <div class="cat-id" style="background:rgba(88,166,255,0.15);color:var(--blue)">A</div>
+  <div class="cat-name" style="color:var(--blue)">기구부 (프레임)</div>
+  <span class="cat-cnt">5개</span>
+</div>
+<table class="ptbl"><thead><tr><th>#</th><th>품명 / 사양</th><th class="c">수량</th><th>구매처</th><th>3D CAD</th></tr></thead><tbody>
+<tr><td class="c">1</td><td><div class="name">6061-T6 알루미늄 플레이트</div><div class="spec">P1~P9 + 거셋 6매, ~54kg</div></td><td class="c">12매</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-6061-T6-aluminum-plate-20mm.html" target="_blank">AliExpress</a><span class="alt">국내: 알루미늄 119 / 김해알루미늄 주문 절단</span></td>
+<td class="cad"><span class="src">자체 설계 (CNC 가공)</span></td></tr>
+<tr><td class="c">2</td><td><div class="name">T-슬롯 테이블</div><div class="spec">250&times;250mm 작업면</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-CNC-T-slot-table-250mm.html" target="_blank">AliExpress</a><span class="alt">국내: 미스미(MISUMI) 주문가공</span></td>
+<td class="cad"><span class="src">자체 설계</span></td></tr>
+<tr><td class="c">3</td><td><div class="name">볼트/나사</div><div class="spec">M5~M10 Grade 10.9 소켓볼트</div></td><td class="c">lot</td>
+<td class="vendor"><a href="https://www.google.com/search?q=%EB%82%98%EC%82%AC%EC%99%95+M8+%EC%86%8C%EC%BC%93%EB%B3%BC%ED%8A%B8+10.9" target="_blank">나사왕</a><span class="alt">대체: 미스미 / 쿠팡</span></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">4</td><td><div class="name">다웰핀</div><div class="spec">6mm, 8mm 정밀 위치결정</div></td><td class="c">20</td>
+<td class="vendor"><a href="https://kr.misumi-ec.com/vona2/detail/221000058898/" target="_blank">미스미</a><span class="alt">대체: 디바이스마트</span></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">5</td><td><div class="name">방진 레벨링 발</div><div class="spec">M10 고무+스틸 높이조절</div></td><td class="c">4</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-anti-vibration-leveling-feet-M10.html" target="_blank">AliExpress</a><span class="alt">대체: 쿠팡</span></td>
+<td class="cad"><span class="src">-</span></td></tr>
+</tbody></table>
+
+<!-- B. 리니어 모션 -->
+<div class="cat">
+  <div class="cat-id" style="background:rgba(126,231,135,0.15);color:var(--green)">B</div>
+  <div class="cat-name" style="color:var(--green)">리니어 모션</div>
+  <span class="cat-cnt">7개</span>
+</div>
+<table class="ptbl"><thead><tr><th>#</th><th>품명 / 사양</th><th class="c">수량</th><th>구매처</th><th>3D CAD</th></tr></thead><tbody>
+<tr><td class="c">6</td><td><div class="name">HGR20 리니어 레일</div><div class="spec">X:500 Y:450 Z:350mm</div></td><td class="c">6</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-HGR20-linear-rail-500mm.html" target="_blank">AliExpress</a><span class="alt">HIWIN 호환 (TBI/PMI도 가능)</span></td>
+<td class="cad"><a href="https://grabcad.com/library?q=HGR20" target="_blank">GrabCAD</a><span class="src"> / HIWIN 공식 (STEP)</span></td></tr>
+<tr><td class="c">7</td><td><div class="name">HGH20CA 블록</div><div class="spec">25kN 동적하중</div></td><td class="c">12</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-HGH20CA-linear-block.html" target="_blank">AliExpress</a><span class="alt">레일과 세트 구매 추천</span></td>
+<td class="cad"><a href="https://grabcad.com/library?q=HGH20CA" target="_blank">GrabCAD</a><span class="src"> (STEP)</span></td></tr>
+<tr><td class="c">8</td><td><div class="name">SFU1605 볼스크류</div><div class="spec">&empty;16 리드5mm C7</div></td><td class="c">3</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-SFU1605-ball-screw-400mm.html" target="_blank">AliExpress</a><span class="alt">BK/BF/너트 세트 구매 가능</span></td>
+<td class="cad"><a href="https://grabcad.com/library?q=SFU1605" target="_blank">GrabCAD</a><span class="src"> (STEP)</span></td></tr>
+<tr><td class="c">9</td><td><div class="name">BK12 고정단 베어링</div><div class="spec">볼스크류 지지</div></td><td class="c">3</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-BK12-BF12-bearing-support.html" target="_blank">AliExpress</a><span class="alt">BK12+BF12 세트 구매</span></td>
+<td class="cad"><a href="https://grabcad.com/library?q=BK12" target="_blank">GrabCAD</a><span class="src"> (STEP)</span></td></tr>
+<tr><td class="c">10</td><td><div class="name">BF12 자유단 베어링</div><div class="spec">볼스크류 지지</div></td><td class="c">3</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-BF12-bearing-support.html" target="_blank">AliExpress</a></td>
+<td class="cad"><a href="https://grabcad.com/library?q=BF12" target="_blank">GrabCAD</a></td></tr>
+<tr><td class="c">11</td><td><div class="name">DSG16H 너트 하우징</div><div class="spec">볼스크류 너트 고정</div></td><td class="c">3</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-DSG16H-ball-screw-nut-housing.html" target="_blank">AliExpress</a></td>
+<td class="cad"><a href="https://grabcad.com/library/ball-screw-nut-housing-dsg16h-1" target="_blank">GrabCAD</a><span class="src"> (STEP, 3,105 DL)</span></td></tr>
+<tr><td class="c">12</td><td><div class="name">스파이더 커플링 8&times;10</div><div class="spec">모터축-볼스크류 연결</div></td><td class="c">3</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-spider-jaw-coupling-8x10mm.html" target="_blank">AliExpress</a></td>
+<td class="cad"><a href="https://grabcad.com/library/jaw-coupling-8x10mm-1" target="_blank">GrabCAD</a><span class="src"> (3,135 DL)</span></td></tr>
+</tbody></table>
+
+<!-- C. 스핀들 시스템 -->
+<div class="cat">
+  <div class="cat-id" style="background:rgba(240,136,62,0.15);color:var(--orange)">C</div>
+  <div class="cat-name" style="color:var(--orange)">스핀들 시스템</div>
+  <span class="cat-cnt">7개</span>
+</div>
+<table class="ptbl"><thead><tr><th>#</th><th>품명 / 사양</th><th class="c">수량</th><th>구매처</th><th>3D CAD</th></tr></thead><tbody>
+<tr><td class="c">13</td><td><div class="name">수냉 스핀들 1kW</div><div class="spec">ER11 65mm 0~24,000 RPM</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-water-cooled-spindle-1kW-ER11-65mm.html" target="_blank">AliExpress</a><span class="alt">VFD + 스핀들 세트 구매 추천</span></td>
+<td class="cad"><a href="https://grabcad.com/library?q=CNC+spindle+65mm" target="_blank">GrabCAD</a></td></tr>
+<tr><td class="c">14</td><td><div class="name">VFD 인버터 1.5kW</div><div class="spec">Huanyang 단상 220V&rarr;3상</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-Huanyang-VFD-1.5kW.html" target="_blank">AliExpress</a></td>
+<td class="cad"><a href="https://grabcad.com/library/huanyang-vfd-controller-1" target="_blank">GrabCAD</a><span class="src"> (STEP, 496 DL)</span></td></tr>
+<tr><td class="c">15</td><td><div class="name">수중펌프 80W</div><div class="spec">냉각수 순환</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-submersible-pump-80W-CNC-cooling.html" target="_blank">AliExpress</a><span class="alt">대체: 쿠팡</span></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">16</td><td><div class="name">실리콘 튜브 + 호스클램프</div><div class="spec">내경 8mm</div></td><td class="c">lot</td>
+<td class="vendor"><a href="https://www.coupang.com/np/search?component=&q=%EC%8B%A4%EB%A6%AC%EC%BD%98+%ED%8A%9C%EB%B8%8C+8mm" target="_blank">쿠팡</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">17</td><td><div class="name">물통 10~20L</div><div class="spec">냉각수 저장</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.coupang.com/np/search?q=%ED%88%AC%EB%AA%85+%EC%88%98%EC%A1%B0+20L" target="_blank">쿠팡</a><span class="alt">대체: 다이소</span></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">18</td><td><div class="name">스핀들 클램프 65mm</div><div class="spec">알루미늄 CNC가공</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-spindle-mount-clamp-65mm-aluminum.html" target="_blank">AliExpress</a></td>
+<td class="cad"><a href="https://grabcad.com/library?q=spindle+clamp+65mm" target="_blank">GrabCAD</a></td></tr>
+<tr><td class="c">19</td><td><div class="name">ER11 콜렛 세트</div><div class="spec">13pc (1~7mm) + 너트 + 렌치</div></td><td class="c">1 set</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-ER11-collet-set-13pcs.html" target="_blank">AliExpress</a></td>
+<td class="cad"><a href="https://grabcad.com/library?q=ER11+collet" target="_blank">GrabCAD</a></td></tr>
+</tbody></table>
+
+<!-- D. 4축 로터리 -->
+<div class="cat">
+  <div class="cat-id" style="background:rgba(188,140,255,0.15);color:var(--purple)">D</div>
+  <div class="cat-name" style="color:var(--purple)">4축 로터리</div>
+  <span class="cat-cnt">3개</span>
+</div>
+<table class="ptbl"><thead><tr><th>#</th><th>품명 / 사양</th><th class="c">수량</th><th>구매처</th><th>3D CAD</th></tr></thead><tbody>
+<tr><td class="c">20</td><td><div class="name">4축 로터리 헤드</div><div class="spec">K11-100 3jaw 척, 90:1 웜기어</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-CNC-4th-axis-rotary-table-K11-100.html" target="_blank">AliExpress</a><span class="alt">대체: 타오바오 (직구)</span></td>
+<td class="cad"><a href="https://grabcad.com/library?q=K11-100+chuck" target="_blank">GrabCAD</a></td></tr>
+<tr><td class="c">21</td><td><div class="name">NEMA23 스테퍼 (A축)</div><div class="spec">3.0Nm 2상</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-NEMA23-stepper-motor-3Nm.html" target="_blank">AliExpress</a></td>
+<td class="cad"><a href="https://grabcad.com/library?q=nema+23+stepper+motor" target="_blank">GrabCAD</a></td></tr>
+<tr><td class="c">22</td><td><div class="name">심압대 MT2</div><div class="spec">MT2 테이퍼, 65mm 중심높이</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-CNC-tailstock-MT2-65mm.html" target="_blank">AliExpress</a></td>
+<td class="cad"><a href="https://grabcad.com/library?q=CNC+tailstock+MT2" target="_blank">GrabCAD</a></td></tr>
+</tbody></table>
+
+<!-- E. 모터 + 드라이버 + 전원 -->
+<div class="cat">
+  <div class="cat-id" style="background:rgba(227,179,65,0.15);color:var(--yellow)">E</div>
+  <div class="cat-name" style="color:var(--yellow)">모터 + 드라이버 + 전원</div>
+  <span class="cat-cnt">4개</span>
+</div>
+<table class="ptbl"><thead><tr><th>#</th><th>품명 / 사양</th><th class="c">수량</th><th>구매처</th><th>3D CAD</th></tr></thead><tbody>
+<tr><td class="c">23</td><td><div class="name">NEMA23 스테퍼 (XYZ)</div><div class="spec">3.0Nm 56mm 2상</div></td><td class="c">3</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-NEMA23-stepper-motor-3Nm-56mm.html" target="_blank">AliExpress</a><span class="alt">국내: 디바이스마트</span></td>
+<td class="cad"><a href="https://cults3d.com/en/3d-model/tool/nema-23-motor-a-pasos-57byg250c-gomezrafael" target="_blank">Cults3D</a><span class="src"> (SLDPRT+STL, Free)</span></td></tr>
+<tr><td class="c">24</td><td><div class="name">DM556 드라이버</div><div class="spec">디지털 20~50V 5.6A 피크</div></td><td class="c">4</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-DM556-stepper-driver.html" target="_blank">AliExpress</a></td>
+<td class="cad"><a href="https://grabcad.com/library?q=DM556" target="_blank">GrabCAD</a><span class="src"> (118&times;76&times;35mm)</span></td></tr>
+<tr><td class="c">25</td><td><div class="name">Mean Well RSP-750-48</div><div class="spec">48V 750W 메인 PSU</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.devicemart.co.kr/goods/search?keyword=RSP-750-48" target="_blank">디바이스마트</a><span class="alt">대체: 엘레파츠 (국내 정품)</span></td>
+<td class="cad"><a href="https://www.meanwell.com/upload/pdf/RSP-750/RSP-750-3D.zip" target="_blank">Mean Well 공식</a><span class="src"> (STEP, Direct DL)</span></td></tr>
+<tr><td class="c">26</td><td><div class="name">Mean Well MDR-60-24</div><div class="spec">24V 60W DIN레일 보조 PSU</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.devicemart.co.kr/goods/search?keyword=MDR-60-24" target="_blank">디바이스마트</a><span class="alt">대체: 엘레파츠</span></td>
+<td class="cad"><a href="https://www.meanwell.com/upload/pdf/MDR-60/MDR-60-3D.zip" target="_blank">Mean Well 공식</a><span class="src"> (STEP, Direct DL)</span></td></tr>
+</tbody></table>
+
+<!-- F. 컨트롤러 + 전자부품 -->
+<div class="cat">
+  <div class="cat-id" style="background:rgba(121,192,255,0.15);color:var(--cyan)">F</div>
+  <div class="cat-name" style="color:var(--cyan)">컨트롤러 + 전자부품</div>
+  <span class="cat-cnt">13개</span>
+</div>
+<table class="ptbl"><thead><tr><th>#</th><th>품명 / 사양</th><th class="c">수량</th><th>구매처</th><th>3D CAD</th></tr></thead><tbody>
+<tr><td class="c">27</td><td><div class="name">grblHAL 보드</div><div class="spec">STM32F446 또는 ESP32, 4축</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-grblHAL-CNC-controller-STM32.html" target="_blank">AliExpress</a><span class="alt">공식: Tindie / GitHub DIY</span></td>
+<td class="cad"><a href="https://www.st.com/en/evaluation-tools/nucleo-f446re.html" target="_blank">ST.com</a><span class="src"> (Nucleo F446RE STEP)</span></td></tr>
+<tr><td class="c">28</td><td><div class="name">74HCT245 레벨시프터</div><div class="spec">3.3V&rarr;5V DM556 구동</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.devicemart.co.kr/goods/search?keyword=74HCT245" target="_blank">디바이스마트</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">29</td><td><div class="name">PWM&rarr;0-10V 변환 모듈</div><div class="spec">VFD AI1 RPM 제어</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-PWM-to-0-10V-converter.html" target="_blank">AliExpress</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">30</td><td><div class="name">NPN 근접센서 M12</div><div class="spec">NC 24V 리미트스위치</div></td><td class="c">7</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-NPN-inductive-proximity-sensor-M12-24V.html" target="_blank">AliExpress</a><span class="alt">국내: 디바이스마트</span></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">31</td><td><div class="name">SSR 40A</div><div class="spec">쿨런트/미스트 M7/M8</div></td><td class="c">2</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-SSR-40A-solid-state-relay.html" target="_blank">AliExpress</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">32</td><td><div class="name">릴레이 모듈 24V</div><div class="spec">보조 출력</div></td><td class="c">2</td>
+<td class="vendor"><a href="https://www.devicemart.co.kr/goods/search?keyword=%EB%A6%B4%EB%A0%88%EC%9D%B4+%EB%AA%A8%EB%93%88+24V" target="_blank">디바이스마트</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">33</td><td><div class="name">비상정지 버튼</div><div class="spec">NC 접점 콘택터 연동</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-emergency-stop-button-mushroom.html" target="_blank">AliExpress</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">34</td><td><div class="name">콘택터</div><div class="spec">24V 코일, AC 메인 차단</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-AC-contactor-24V-coil.html" target="_blank">AliExpress</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">35</td><td><div class="name">터미널 블록 + DIN레일</div><div class="spec">전장함 배선 정리</div></td><td class="c">lot</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-DIN-rail-terminal-block-set.html" target="_blank">AliExpress</a><span class="alt">국내: 디바이스마트</span></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">36</td><td><div class="name">케이블 체인</div><div class="spec">15&times;30mm X+Y+Z축</div></td><td class="c">3</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-cable-drag-chain-15x30mm.html" target="_blank">AliExpress</a></td>
+<td class="cad"><a href="https://grabcad.com/library?q=cable+drag+chain+15x30" target="_blank">GrabCAD</a><span class="src"> / igus 공식</span></td></tr>
+<tr><td class="c">37</td><td><div class="name">배선</div><div class="spec">18AWG 차폐 10m + 신호선</div></td><td class="c">lot</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-shielded-cable-18AWG-4-conductor.html" target="_blank">AliExpress</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">38</td><td><div class="name">GX16 항공커넥터</div><div class="spec">모터/센서 착탈식</div></td><td class="c">9 set</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-GX16-aviation-connector-plug-socket.html" target="_blank">AliExpress</a></td>
+<td class="cad"><a href="https://grabcad.com/library?q=GX16+connector" target="_blank">GrabCAD</a></td></tr>
+<tr><td class="c">39</td><td><div class="name">기타</div><div class="spec">페라이트 코어, 퓨즈, 메인 스위치</div></td><td class="c">lot</td>
+<td class="vendor"><a href="https://www.devicemart.co.kr/" target="_blank">디바이스마트</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+</tbody></table>
+
+<!-- G. 공구 + 액세서리 -->
+<div class="cat">
+  <div class="cat-id" style="background:rgba(248,81,73,0.15);color:var(--red)">G</div>
+  <div class="cat-name" style="color:var(--red)">공구 + 액세서리</div>
+  <span class="cat-cnt">12개</span>
+</div>
+<table class="ptbl"><thead><tr><th>#</th><th>품명 / 사양</th><th class="c">수량</th><th>구매처</th><th>3D CAD</th></tr></thead><tbody>
+<tr><td class="c">40</td><td><div class="name">CNC 바이스 QKG73</div><div class="spec">정밀 공작물 고정</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-CNC-milling-vise-QKG73.html" target="_blank">AliExpress</a><span class="alt">대체: 타오바오</span></td>
+<td class="cad"><a href="https://grabcad.com/library?q=CNC+milling+vise" target="_blank">GrabCAD</a></td></tr>
+<tr><td class="c">41</td><td><div class="name">2날 카바이드 엔드밀</div><div class="spec">&empty;2, 3, 4, 6mm</div></td><td class="c">set</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-2-flute-carbide-end-mill-set.html" target="_blank">AliExpress</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">42</td><td><div class="name">볼노즈 엔드밀</div><div class="spec">&empty;2, 3, 4mm 3D 곡면</div></td><td class="c">set</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-ball-nose-end-mill-carbide.html" target="_blank">AliExpress</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">43</td><td><div class="name">V-bit 세트</div><div class="spec">30&deg; / 60&deg; / 90&deg;</div></td><td class="c">set</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-CNC-V-bit-engraving-carbide.html" target="_blank">AliExpress</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">44</td><td><div class="name">드릴 비트 세트</div><div class="spec">1~6mm 카바이드</div></td><td class="c">set</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-carbide-drill-bit-set-1-6mm.html" target="_blank">AliExpress</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">45</td><td><div class="name">다이얼 인디케이터</div><div class="spec">0.01mm + 마그네틱 베이스</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-dial-indicator-0.01mm-magnetic-base.html" target="_blank">AliExpress</a><span class="alt">정밀도 중요: 미쓰토요 추천</span></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">46</td><td><div class="name">에지 파인더</div><div class="spec">기계식 원점 설정</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-mechanical-edge-finder-CNC.html" target="_blank">AliExpress</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">47</td><td><div class="name">자동 툴세터</div><div class="spec">공구 길이 프로빙 G38.x</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-CNC-tool-length-setter-probe.html" target="_blank">AliExpress</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">48</td><td><div class="name">안전안경</div><div class="spec">절삭유/칩 방호</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.coupang.com/np/search?q=%EC%95%88%EC%A0%84%EC%95%88%EA%B2%BD+%EC%A0%88%EC%82%AD" target="_blank">쿠팡</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">49</td><td><div class="name">웨이오일 + 그리스</div><div class="spec">ISO 68 웨이오일, 리튬 그리스</div></td><td class="c">set</td>
+<td class="vendor"><a href="https://www.coupang.com/np/search?q=%EC%9B%A8%EC%9D%B4%EC%98%A4%EC%9D%BC+%EB%B3%BC%EC%8A%A4%ED%81%AC%EB%A5%98+%EA%B7%B8%EB%A6%AC%EC%8A%A4" target="_blank">쿠팡</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">50</td><td><div class="name">MQL 미스트 시스템</div><div class="spec">최소량윤활 에어+오일 분무</div></td><td class="c">1</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-MQL-mist-lubrication-system-CNC.html" target="_blank">AliExpress</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+<tr><td class="c">51</td><td><div class="name">패럴럴 바 세트</div><div class="spec">정밀 높이맞춤</div></td><td class="c">set</td>
+<td class="vendor"><a href="https://www.aliexpress.com/w/wholesale-parallel-bar-set-milling-vise.html" target="_blank">AliExpress</a></td>
+<td class="cad"><span class="src">-</span></td></tr>
+</tbody></table>
+
+<!-- ══════════════════════════════════════════════
+     3D CAD DIRECT DOWNLOADS
+     ══════════════════════════════════════════════ -->
+<div class="sec">
+  <h2>3D CAD Files &mdash; Direct Download</h2>
+  <p>아래 파일은 공식 사이트에서 직접 다운로드 가능합니다. GrabCAD 파일은 무료 계정 가입 후 다운로드하세요.</p>
+</div>
+
+<div class="cad-grid">
+  <a class="cad-card" href="https://www.meanwell.com/upload/pdf/RSP-750/RSP-750-3D.zip" target="_blank" style="text-decoration:none;color:inherit">
+    <div class="cad-icon">STEP</div>
+    <div class="cad-info">
+      <div class="cad-name">Mean Well RSP-750-48</div>
+      <div class="cad-src">공식 STEP (ZIP) &mdash; 로그인 불필요</div>
+    </div>
+  </a>
+  <a class="cad-card" href="https://www.meanwell.com/upload/pdf/MDR-60/MDR-60-3D.zip" target="_blank" style="text-decoration:none;color:inherit">
+    <div class="cad-icon">STEP</div>
+    <div class="cad-info">
+      <div class="cad-name">Mean Well MDR-60-24</div>
+      <div class="cad-src">공식 STEP (ZIP) &mdash; 로그인 불필요</div>
+    </div>
+  </a>
+  <a class="cad-card" href="https://cults3d.com/en/3d-model/tool/nema-23-motor-a-pasos-57byg250c-gomezrafael" target="_blank" style="text-decoration:none;color:inherit">
+    <div class="cad-icon">SLD</div>
+    <div class="cad-info">
+      <div class="cad-name">NEMA23 57BYG250C</div>
+      <div class="cad-src">Cults3D &mdash; SLDPRT + STL (Free)</div>
+    </div>
+  </a>
+  <a class="cad-card" href="https://raw.githubusercontent.com/Robolink-projects/nema17-shinano-kenshi-STP-42E2131-solidworks-design/main/Part8.STEP" target="_blank" style="text-decoration:none;color:inherit">
+    <div class="cad-icon">STEP</div>
+    <div class="cad-info">
+      <div class="cad-name">NEMA17 42mm (PCB-D300용)</div>
+      <div class="cad-src">GitHub &mdash; 155KB STEP Direct DL</div>
+    </div>
+  </a>
+  <a class="cad-card" href="https://grabcad.com/library/ball-screw-nut-housing-dsg16h-1" target="_blank" style="text-decoration:none;color:inherit">
+    <div class="cad-icon">STEP</div>
+    <div class="cad-info">
+      <div class="cad-name">DSG16H 너트 하우징</div>
+      <div class="cad-src">GrabCAD &mdash; STEP + Fusion 360 (3,105 DL)</div>
+    </div>
+  </a>
+  <a class="cad-card" href="https://grabcad.com/library/huanyang-vfd-controller-1" target="_blank" style="text-decoration:none;color:inherit">
+    <div class="cad-icon">STEP</div>
+    <div class="cad-info">
+      <div class="cad-name">Huanyang VFD 인버터</div>
+      <div class="cad-src">GrabCAD &mdash; STEP + IGES (496 DL)</div>
+    </div>
+  </a>
+  <a class="cad-card" href="https://grabcad.com/library/jaw-coupling-8x10mm-1" target="_blank" style="text-decoration:none;color:inherit">
+    <div class="cad-icon">SLD</div>
+    <div class="cad-info">
+      <div class="cad-name">스파이더 커플링 8&times;10mm</div>
+      <div class="cad-src">GrabCAD &mdash; SolidWorks 2013 (3,135 DL)</div>
+    </div>
+  </a>
+  <a class="cad-card" href="https://grabcad.com/library/dsg16h-ballscrew-nut-housing-1" target="_blank" style="text-decoration:none;color:inherit">
+    <div class="cad-icon">STEP</div>
+    <div class="cad-info">
+      <div class="cad-name">DSG16H (대체 모델)</div>
+      <div class="cad-src">GrabCAD &mdash; STEP + IGES (2,479 DL)</div>
+    </div>
+  </a>
+</div>
+
+<div class="note">
+  <strong>GrabCAD 검색 팁:</strong> grabcad.com 무료 계정 가입 후 HGR20, HGH20CA, SFU1605, BK12, BF12, DM556 등을 검색하면 대부분 STEP/IGES 파일을 다운로드할 수 있습니다. HIWIN 공식 사이트(hiwin.com)에서도 HG 시리즈 CAD 데이터를 무료 제공합니다.
+</div>
+
+<!-- ══════════════════════════════════════════════
+     구매 전략
+     ══════════════════════════════════════════════ -->
+<div class="sec">
+  <h2>Procurement Strategy &mdash; 구매 전략</h2>
+</div>
+
+<div class="note" style="border-color:rgba(126,231,135,0.3);background:rgba(126,231,135,0.04)">
+  <strong style="color:var(--green)">AliExpress 일괄 구매 (1차 추천)</strong><br>
+  리니어 레일, 볼스크류, 모터, 드라이버, 스핀들+VFD 세트, 로터리 헤드 등 기구부/구동부의 70% 이상을 AliExpress에서 구매 가능합니다. 배송 2~3주 소요. "CNC milling kit" 세트 판매도 있으나 사양이 맞지 않을 수 있으므로 개별 구매 추천.<br><br>
+  <strong style="color:var(--yellow)">국내 구매 (품질/AS 우선)</strong><br>
+  &bull; <strong>디바이스마트</strong> / <strong>엘레파츠</strong>: Mean Well PSU, 전자부품, 센서, 릴레이<br>
+  &bull; <strong>미스미(MISUMI)</strong>: 다웰핀, 볼트류, 정밀 기계 부품 (MOQ 1개부터)<br>
+  &bull; <strong>나사왕</strong>: 볼트/나사/와셔 대량 구매<br>
+  &bull; <strong>쿠팡</strong>: 소모품, 안전장비, 실리콘 튜브, 오일/그리스<br><br>
+  <strong style="color:var(--orange)">알루미늄 프레임 (특수)</strong><br>
+  P1~P9 알루미늄 플레이트는 국내 알루미늄 전문 업체에서 6061-T6 판재를 주문 절단합니다. 김해알루미늄, 알루미늄119 등에서 도면 보내면 CNC 절단 + 홀 가공 서비스 제공.
+</div>
+
+<div class="footer">
+  <p style="margin-bottom:8px;">
+    <a href="/cnc-milling.html">&larr; CNC-M200 설계서</a> &nbsp;&middot;&nbsp;
+    <a href="/cnc-milling-bom.html">Parts List (BOM)</a> &nbsp;&middot;&nbsp;
+    <a href="/cnc-milling-photos.html">Parts Catalog</a> &nbsp;&middot;&nbsp;
+    <a href="/cnc-milling-3d.html">3D Assembly</a> &nbsp;&middot;&nbsp;
+    <a href="/pcb-drill-purchase.html">PCB-D300 Purchase Guide &rarr;</a>
+  </p>
+  <p>&copy; 2026 SY-BAEK Engineering</p>
+</div>
+
+</div><!-- /wrap -->
+</body>
+</html>
