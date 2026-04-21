@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CNC-M200 Parts Photo Catalog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0d1117;--card:#1c2128;--card-h:#242a33;--border:#30363d;
+  --t1:#c9d1d9;--t2:#8b949e;--th:#e6edf3;
+  --blue:#58a6ff;--green:#7ee787;--orange:#f0883e;--purple:#bc8cff;
+  --yellow:#e3b341;--cyan:#79c0ff;--red:#f85149;
+  --font:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);line-height:1.6;font-size:15px;min-height:100vh;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding:40px 24px 60px}
+h1{color:var(--th);font-size:1.8rem;text-align:center;margin-bottom:6px}
+h1 span{color:var(--blue)}
+.sub{text-align:center;color:var(--t2);font-size:0.9rem;margin-bottom:32px}
+.cat{margin:32px 0 12px;padding:14px 20px;background:var(--card);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:12px}
+.cat-badge{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:800;flex-shrink:0}
+.cat-name{font-size:1rem;font-weight:700;color:var(--th);flex:1}
+.cat-cnt{font-size:0.8rem;color:var(--t2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;gap:14px;align-items:flex-start;cursor:pointer;transition:all 0.2s;text-decoration:none;color:inherit}
+.card:hover{background:var(--card-h);border-color:#484f58;transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,0.3);text-decoration:none}
+.card-num{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:800;flex-shrink:0}
+.card-info{flex:1;min-width:0}
+.card-name{font-size:0.9rem;font-weight:700;color:var(--th);line-height:1.4;margin-bottom:3px}
+.card-spec{font-size:0.78rem;color:var(--t2);line-height:1.4;margin-bottom:4px}
+.card-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card-qty{font-size:0.72rem;font-weight:600;padding:2px 8px;border-radius:10px;background:rgba(126,231,135,0.1);color:var(--green);border:1px solid rgba(126,231,135,0.2)}
+.card-search{font-size:0.7rem;color:var(--blue);opacity:0.6}
+.card:hover .card-search{opacity:1}
+.footer{text-align:center;color:var(--t2);font-size:0.8rem;margin-top:40px;padding-top:20px;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>CNC-M200 <span>Parts Catalog</span></h1>
+<p class="sub">각 부품을 클릭하면 구글 이미지 검색이 열립니다 — 51개 부품, 7개 카테고리</p>
+
+<div id="app"></div>
+
+<div class="footer">&copy; 2026 SY-BAEK Engineering &mdash; CNC-M200 4-Axis Milling Machine</div>
+</div>
+
+<script>
+const C=[
+{id:'A',name:'기구부 (프레임)',color:'#58a6ff',items:[
+{n:1,name:'6061-T6 알루미늄 플레이트',spec:'P1~P9 + 거셋 6매, ~54kg',qty:'12매',q:'6061-T6 aluminum plate CNC frame'},
+{n:2,name:'T-슬롯 테이블',spec:'250×250mm 작업면',qty:'1',q:'CNC T-slot table 250mm aluminum'},
+{n:3,name:'볼트/나사',spec:'M5~M10 Grade 10.9 소켓볼트',qty:'lot',q:'M8 socket head cap screw grade 10.9'},
+{n:4,name:'다웰핀',spec:'6mm, 8mm 정밀 위치결정',qty:'20',q:'dowel pin 6mm 8mm precision'},
+{n:5,name:'방진 레벨링 발',spec:'M10 고무+스틸 높이조절',qty:'4',q:'anti vibration leveling feet M10 CNC machine'}
+]},
+{id:'B',name:'리니어 모션',color:'#7ee787',items:[
+{n:6,name:'HGR20 리니어 레일',spec:'X:500 Y:450 Z:350mm',qty:'6',q:'HGR20 linear rail guide'},
+{n:7,name:'HGH20CA 블록',spec:'25kN 동적하중',qty:'12',q:'HGH20CA linear bearing block'},
+{n:8,name:'SFU1605 볼스크류',spec:'∅16 리드5mm C7',qty:'3',q:'SFU1605 ball screw 5mm lead'},
+{n:9,name:'BK12 고정단 베어링',spec:'볼스크류 지지',qty:'3',q:'BK12 fixed bearing support ball screw'},
+{n:10,name:'BF12 자유단 베어링',spec:'볼스크류 지지',qty:'3',q:'BF12 free end bearing support'},
+{n:11,name:'DSG16H 너트 하우징',spec:'볼스크류 너트 고정',qty:'3',q:'DSG16H ball screw nut housing bracket'},
+{n:12,name:'스파이더 커플링 8×10',spec:'모터-볼스크류 연결',qty:'3',q:'spider jaw coupling 8x10mm flexible'}
+]},
+{id:'C',name:'스핀들 시스템',color:'#f0883e',items:[
+{n:13,name:'수냉 스핀들 1kW',spec:'ER11 65mm 0~24,000RPM',qty:'1',q:'water cooled spindle 1kW ER11 65mm 24000rpm CNC'},
+{n:14,name:'VFD 인버터 1.5kW',spec:'Huanyang 220V→3상',qty:'1',q:'Huanyang VFD 1.5kW inverter 220V spindle'},
+{n:15,name:'수중펌프',spec:'80W 냉각수 순환',qty:'1',q:'submersible water pump 80W CNC spindle cooling'},
+{n:16,name:'실리콘 튜브 + 호스클램프',spec:'내경 8mm',qty:'lot',q:'silicone tube 8mm hose clamp water cooling'},
+{n:17,name:'물통',spec:'10~20L 냉각수 저장',qty:'1',q:'CNC spindle water cooling tank bucket'},
+{n:18,name:'스핀들 클램프 65mm',spec:'알루미늄 CNC가공',qty:'1',q:'spindle mount clamp 65mm aluminum CNC'},
+{n:19,name:'ER11 콜렛 세트',spec:'13pc (1~7mm) + 너트',qty:'1 set',q:'ER11 collet set 1-7mm spring collet'}
+]},
+{id:'D',name:'4축 로터리',color:'#bc8cff',items:[
+{n:20,name:'4축 로터리 헤드',spec:'K11-100 3jaw 90:1 웜기어',qty:'1',q:'CNC 4th axis rotary table K11-100 chuck worm gear'},
+{n:21,name:'NEMA23 스테퍼 (A축)',spec:'3.0Nm 2상',qty:'1',q:'NEMA23 stepper motor 3Nm'},
+{n:22,name:'심압대',spec:'MT2 테이퍼 65mm 중심높이',qty:'1',q:'CNC tailstock MT2 taper 65mm center height'}
+]},
+{id:'E',name:'모터 + 드라이버 + 전원',color:'#e3b341',items:[
+{n:23,name:'NEMA23 스테퍼 (XYZ)',spec:'3.0Nm 56mm',qty:'3',q:'NEMA23 stepper motor 3Nm 56mm'},
+{n:24,name:'DM556 드라이버',spec:'디지털 20~50V 5.6A',qty:'4',q:'DM556 digital stepper driver'},
+{n:25,name:'Mean Well RSP-750-48',spec:'48V 750W PSU',qty:'1',q:'Mean Well RSP-750-48 power supply'},
+{n:26,name:'Mean Well MDR-60-24',spec:'24V 60W DIN레일 PSU',qty:'1',q:'Mean Well MDR-60-24 DIN rail power supply'}
+]},
+{id:'F',name:'컨트롤러 + 전자부품',color:'#79c0ff',items:[
+{n:27,name:'grblHAL 보드',spec:'STM32F446 4축 XYZA',qty:'1',q:'grblHAL CNC controller board STM32F446'},
+{n:28,name:'74HCT245 레벨시프터',spec:'3.3V→5V DM556 구동',qty:'1',q:'74HCT245 level shifter DIP'},
+{n:29,name:'PWM→0-10V 변환 모듈',spec:'VFD AI1 RPM 제어',qty:'1',q:'PWM to 0-10V converter module VFD'},
+{n:30,name:'NPN 근접센서 M12',spec:'NC 24V 리미트스위치',qty:'7',q:'NPN inductive proximity sensor M12 24V NC'},
+{n:31,name:'SSR 40A',spec:'쿨런트/미스트 M7/M8',qty:'2',q:'solid state relay SSR 40A DC control AC'},
+{n:32,name:'릴레이 모듈 24V',spec:'보조 출력 제어',qty:'2',q:'relay module 24V 2 channel'},
+{n:33,name:'비상정지 버튼',spec:'NC 접점 콘택터 연동',qty:'1',q:'emergency stop button NC mushroom head'},
+{n:34,name:'콘택터',spec:'24V 코일 AC 메인 차단',qty:'1',q:'AC contactor 24V coil CNC'},
+{n:35,name:'터미널 블록 + DIN레일',spec:'전장함 배선 정리',qty:'lot',q:'DIN rail terminal block set'},
+{n:36,name:'케이블 체인',spec:'15×30mm X+Y+Z축',qty:'3',q:'cable drag chain 15x30mm CNC'},
+{n:37,name:'배선',spec:'18AWG 차폐 10m + 신호선',qty:'lot',q:'shielded cable 18AWG 4 conductor CNC'},
+{n:38,name:'GX16 항공커넥터',spec:'모터/센서 착탈식',qty:'9 set',q:'GX16 aviation connector plug socket'},
+{n:39,name:'기타',spec:'페라이트 코어, 퓨즈, 메인 스위치',qty:'lot',q:'ferrite core fuse main power switch CNC'}
+]},
+{id:'G',name:'공구 + 액세서리',color:'#f85149',items:[
+{n:40,name:'CNC 바이스 QKG73',spec:'정밀 공작물 고정',qty:'1',q:'CNC milling vise QKG73 precision'},
+{n:41,name:'2날 카바이드 엔드밀',spec:'∅2, 3, 4, 6mm',qty:'set',q:'2 flute carbide end mill set 2mm 3mm 4mm 6mm'},
+{n:42,name:'볼노즈 엔드밀',spec:'∅2, 3, 4mm 3D 곡면',qty:'set',q:'ball nose end mill carbide 2mm 3mm 4mm'},
+{n:43,name:'V-bit 세트',spec:'30° / 60° / 90°',qty:'set',q:'CNC V-bit engraving set 30 60 90 degree carbide'},
+{n:44,name:'드릴 비트 세트',spec:'1~6mm 카바이드',qty:'set',q:'carbide drill bit set 1mm to 6mm'},
+{n:45,name:'다이얼 인디케이터',spec:'0.01mm + 마그네틱 베이스',qty:'1',q:'dial indicator 0.01mm magnetic base stand'},
+{n:46,name:'에지 파인더',spec:'기계식 원점 설정',qty:'1',q:'mechanical edge finder CNC milling'},
+{n:47,name:'자동 툴세터',spec:'공구 길이 프로빙 G38.x',qty:'1',q:'CNC automatic tool length setter probe'},
+{n:48,name:'안전안경',spec:'절삭유/칩 방호',qty:'1',q:'safety glasses anti splash CNC machining'},
+{n:49,name:'웨이오일 + 그리스',spec:'ISO 68 웨이오일, 리튬 그리스',qty:'set',q:'way oil ISO 68 ball screw grease CNC'},
+{n:50,name:'MQL 미스트 시스템',spec:'최소량윤활 에어+오일 분무',qty:'1',q:'MQL minimum quantity lubrication mist system CNC'},
+{n:51,name:'패럴럴 바 세트',spec:'정밀 높이맞춤',qty:'set',q:'parallel bar set precision CNC milling vise'}
+]}
+];
+
+let h='';
+C.forEach(cat=>{
+  h+=`<div class="cat"><div class="cat-badge" style="background:${cat.color}20;color:${cat.color}">${cat.id}</div><div class="cat-name" style="color:${cat.color}">${cat.name}</div><span class="cat-cnt">${cat.items.length}개</span></div><div class="grid">`;
+  cat.items.forEach(p=>{
+    const url='https://www.google.com/search?tbm=isch&q='+encodeURIComponent(p.q);
+    h+=`<a class="card" href="${url}" target="_blank" rel="noopener"><div class="card-num" style="background:${cat.color}18;color:${cat.color}">${p.n}</div><div class="card-info"><div class="card-name">${p.name}</div><div class="card-spec">${p.spec}</div><div class="card-bottom"><span class="card-qty">x ${p.qty}</span><span class="card-search">Click → 이미지 검색</span></div></div></a>`;
+  });
+  h+='</div>';
+});
+document.getElementById('app').innerHTML=h;
+</script>
+</body>
+</html>

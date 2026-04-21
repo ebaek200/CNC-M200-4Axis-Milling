@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CNC-M200 3D Assembly</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d1117;overflow:hidden;font-family:'Noto Sans KR',sans-serif}
+#info{position:fixed;top:16px;left:50%;transform:translateX(-50%);color:#c9d1d9;font-size:13px;text-align:center;z-index:10;pointer-events:none}
+#info h2{font-size:18px;color:#58a6ff;margin-bottom:4px}
+#label{position:fixed;padding:6px 14px;background:rgba(22,27,34,0.92);border:1px solid #30363d;border-radius:8px;color:#e6edf3;font-size:13px;font-weight:600;pointer-events:none;display:none;z-index:20;white-space:nowrap}
+#legend{position:fixed;bottom:16px;left:16px;background:rgba(22,27,34,0.9);border:1px solid #30363d;border-radius:10px;padding:12px 16px;z-index:10;font-size:12px;color:#8b949e}
+#legend div{display:flex;align-items:center;gap:8px;margin:3px 0}
+#legend span{width:12px;height:12px;border-radius:3px;display:inline-block}
+canvas{display:block}
+</style>
+</head>
+<body>
+<div id="info">
+  <h2>CNC-M200 — 4-Axis Milling Machine</h2>
+  <span>마우스 드래그: 회전 | 스크롤: 줌 | 우클릭 드래그: 이동 | 부품 호버: 이름 표시</span>
+</div>
+<div id="label"></div>
+<div id="legend">
+  <div><span style="background:#94a3b8"></span>A. 프레임</div>
+  <div><span style="background:#7ee787"></span>B. 리니어</div>
+  <div><span style="background:#f0883e"></span>C. 스핀들</div>
+  <div><span style="background:#bc8cff"></span>D. 로터리</div>
+  <div><span style="background:#e3b341"></span>E. 모터/전원</div>
+  <div><span style="background:#79c0ff"></span>F. 전자부</div>
+</div>
+
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+<script type="importmap">
+{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x0d1117);
+scene.fog=new THREE.Fog(0x0d1117,80,200);
+
+const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,500);
+camera.position.set(55,40,55);
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const ctrl=new OrbitControls(camera,renderer.domElement);
+ctrl.enableDamping=true;
+ctrl.dampingFactor=0.08;
+ctrl.target.set(0,12,0);
+
+/* Lights */
+scene.add(new THREE.AmbientLight(0x404860,1.2));
+const dl=new THREE.DirectionalLight(0xffffff,1.5);
+dl.position.set(30,50,40);dl.castShadow=true;
+dl.shadow.mapSize.set(1024,1024);
+dl.shadow.camera.left=-40;dl.shadow.camera.right=40;
+dl.shadow.camera.top=40;dl.shadow.camera.bottom=-40;
+scene.add(dl);
+const dl2=new THREE.DirectionalLight(0x8888ff,0.4);
+dl2.position.set(-20,30,-30);scene.add(dl2);
+
+/* Grid */
+const grid=new THREE.GridHelper(80,40,0x1e2330,0x1e2330);
+grid.position.y=-0.5;scene.add(grid);
+
+/* Materials */
+const mat=(c,o=1)=>new THREE.MeshStandardMaterial({color:c,roughness:0.5,metalness:0.3,transparent:o<1,opacity:o});
+const M={
+  frame:mat(0x94a3b8),table:mat(0xb0b8c4),
+  rail:mat(0x7ee787),block:mat(0x5cc96e),screw:mat(0x4aba5c),
+  spindle:mat(0xf0883e),vfd:mat(0xd06020),
+  rotary:mat(0xbc8cff),chuck:mat(0xa070e0),
+  motor:mat(0xe3b341),psu:mat(0xc49a30),
+  ctrl:mat(0x79c0ff),wire:mat(0x5090d0),
+  ghost:mat(0x94a3b8,0.15)
+};
+
+const parts=[];
+function box(w,h,d,x,y,z,m,name){
+  const g=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);
+  g.position.set(x,y,z);g.castShadow=true;g.receiveShadow=true;
+  g.userData.name=name;scene.add(g);parts.push(g);return g;
+}
+function cyl(r,h,x,y,z,m,name,rx=0,rz=0){
+  const g=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,24),m);
+  g.position.set(x,y,z);g.rotation.x=rx;g.rotation.z=rz;
+  g.castShadow=true;g.userData.name=name;scene.add(g);parts.push(g);return g;
+}
+
+/* ===== A. FRAME (cm scale: 1unit = 1cm) ===== */
+// Base plate 50×2×45
+box(50,2,45, 0,1,0, M.frame,'P1 베이스 플레이트 (500×450×20mm)');
+// Left column
+box(2,38,35, -24,21,-0.5, M.frame,'P2 좌측 컬럼');
+// Right column
+box(2,38,35, 24,21,-0.5, M.frame,'P3 우측 컬럼');
+// Top plate (투명)
+box(50,2,35, 0,40,-0.5, M.ghost,'P4 상부 플레이트');
+// Back wall (투명)
+box(50,38,2, 0,21,-17, M.ghost,'P5 후면 벽');
+// Gussets (4 corner reinforcements)
+[[-23,39,-16],[23,39,-16],[-23,3,-16],[23,3,-16]].forEach((p,i)=>{
+  box(3,3,3, p[0],p[1],p[2], M.frame,'거셋 #'+(i+1));
+});
+
+/* Y-axis saddle */
+box(35,2.5,30, 0,5,2, M.frame,'Y축 새들 플레이트');
+
+/* T-slot table */
+box(25,2,25, 0,8.5,2, M.table,'T-슬롯 테이블 (250×250mm)');
+// T-slot grooves (visual)
+for(let i=-8;i<=8;i+=4){
+  box(25,0.6,0.8, 0,9.8,2+i, mat(0x707880),'T-슬롯 홈');
+}
+
+/* ===== B. LINEAR MOTION ===== */
+// Y-axis rails on base (along Z)
+box(2,1.5,30, -14,3,2, M.rail,'HGR20 Y축 레일 L');
+box(2,1.5,30, 14,3,2, M.rail,'HGR20 Y축 레일 R');
+// Y-axis blocks
+[[-14,4.2,-5],[-14,4.2,9],[14,4.2,-5],[14,4.2,9]].forEach((p,i)=>{
+  box(3,2,4, p[0],p[1],p[2], M.block,'HGH20CA Y블록 #'+(i+1));
+});
+// Y ball screw
+cyl(0.8,28, 0,3.5,2, M.screw,'SFU1605 Y축 볼스크류', Math.PI/2,0);
+
+// X-axis rails on saddle (along X)
+box(35,1.5,2, 0,6.5,-4, M.rail,'HGR20 X축 레일 F');
+box(35,1.5,2, 0,6.5,8, M.rail,'HGR20 X축 레일 R');
+// X-axis blocks
+[[-6,7.5,-4],[6,7.5,-4],[-6,7.5,8],[6,7.5,8]].forEach((p,i)=>{
+  box(4,2,3, p[0],p[1],p[2], M.block,'HGH20CA X블록 #'+(i+1));
+});
+// X ball screw
+cyl(0.8,32, 0,6,2, M.screw,'SFU1605 X축 볼스크류', 0,Math.PI/2);
+
+// Z-axis rails on back wall (vertical)
+box(2,28,1.5, -7,22,-15.5, M.rail,'HGR20 Z축 레일 L');
+box(2,28,1.5, 7,22,-15.5, M.rail,'HGR20 Z축 레일 R');
+// Z-axis blocks
+[[-7,18,-14.5],[-7,28,-14.5],[7,18,-14.5],[7,28,-14.5]].forEach((p,i)=>{
+  box(3,4,2, p[0],p[1],p[2], M.block,'HGH20CA Z블록 #'+(i+1));
+});
+// Z ball screw
+cyl(0.8,25, 0,23,-15.5, M.screw,'SFU1605 Z축 볼스크류');
+// BK/BF bearings
+cyl(1.5,2, 0,36,-15.5, M.block,'BK12 Z축 고정단 베어링');
+cyl(1.2,2, 0,10,-15.5, M.block,'BF12 Z축 자유단 베어링');
+
+/* ===== C. SPINDLE ===== */
+// Z head plate
+box(18,22,2, 0,23,-13, M.spindle,'Z축 헤드 플레이트');
+// Spindle body
+cyl(3.2,18, 0,16,-10, M.spindle,'수냉 스핀들 1kW (∅65mm)');
+// ER11 collet
+cyl(1.2,3, 0,5.5,-10, M.vfd,'ER11 콜렛');
+// Spindle clamp
+cyl(4,2.5, 0,25,-10, M.spindle,'스핀들 클램프 65mm');
+
+/* VFD */
+box(10,15,8, -30,10,-17, M.vfd,'VFD 인버터 1.5kW');
+/* Water pump */
+box(5,5,5, -30,2.5,-5, mat(0xc06030),'수중펌프 80W');
+
+/* ===== D. 4TH AXIS ROTARY ===== */
+cyl(5,8, -4,12,2, M.rotary,'4축 로터리 헤드 K11-100', 0,Math.PI/2);
+cyl(5,4, -9,12,2, M.chuck,'K11-100 3jaw 척', 0,Math.PI/2);
+// Tailstock
+box(5,5,5, 10,12,2, M.rotary,'심압대 MT2');
+cyl(0.5,3, 13,12,2, M.chuck,'심압대 센터 팁', 0,Math.PI/2);
+
+/* ===== E. MOTORS ===== */
+// Y motor (front of Y screw)
+box(5.6,5.6,5.6, 0,3.5,-14, M.motor,'NEMA23 Y축 모터');
+// X motor (side of X screw)
+box(5.6,5.6,5.6, -20,6,2, M.motor,'NEMA23 X축 모터');
+// Z motor (top of Z screw)
+box(5.6,5.6,5.6, 0,39,-15.5, M.motor,'NEMA23 Z축 모터');
+// A motor (on rotary)
+box(5.6,5.6,5.6, -14,12,2, M.motor,'NEMA23 A축 모터');
+
+/* DM556 drivers (on back) */
+for(let i=0;i<4;i++){
+  box(3,5,7, 16+i*4.5,10,-19, M.psu,'DM556 드라이버 #'+(i+1));
+}
+/* PSU */
+box(12,6,4, 16,18,-19, M.psu,'Mean Well RSP-750-48');
+box(6,4,3, 28,18,-19, M.psu,'Mean Well MDR-60-24');
+
+/* ===== F. CONTROLLER ===== */
+box(8,5,6, 0,10,-19, M.ctrl,'grblHAL 컨트롤러 보드');
+// E-stop button
+cyl(2,1.5, -20,42,0, mat(0xf85149),'비상정지 버튼');
+// Cable chains (simplified as boxes)
+box(20,2,3, 0,2.5,20, M.wire,'케이블 체인 Y축');
+box(3,2,15, -22,6.5,2, M.wire,'케이블 체인 X축');
+box(3,15,2, 12,28,-14, M.wire,'케이블 체인 Z축');
+
+/* ===== Hover label ===== */
+const raycaster=new THREE.Raycaster();
+const mouse=new THREE.Vector2();
+const label=document.getElementById('label');
+
+window.addEventListener('mousemove',e=>{
+  mouse.x=(e.clientX/innerWidth)*2-1;
+  mouse.y=-(e.clientY/innerHeight)*2+1;
+  raycaster.setFromCamera(mouse,camera);
+  const hits=raycaster.intersectObjects(parts);
+  if(hits.length>0&&hits[0].object.userData.name){
+    label.style.display='block';
+    label.style.left=(e.clientX+14)+'px';
+    label.style.top=(e.clientY-10)+'px';
+    label.textContent=hits[0].object.userData.name;
+  }else{
+    label.style.display='none';
+  }
+});
+
+/* Resize */
+window.addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+
+/* Animate */
+(function loop(){
+  requestAnimationFrame(loop);
+  ctrl.update();
+  renderer.render(scene,camera);
+})();
+</script>
+</body>
+</html>

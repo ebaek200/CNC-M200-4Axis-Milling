@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CNC-M200: 4-Axis Milling Machine — SY-BAEK Engineering</title>
+<meta name="description" content="CNC-M200 4-Axis Milling Machine. 알루미늄 정밀가공을 위한 고정 컬럼 박스 구조. grblHAL 4축 제어. 전체 설계 제안서.">
+<meta property="og:title" content="CNC-M200: 4-Axis Milling Machine — SY-BAEK Engineering">
+<meta property="og:description" content="4-Axis CNC Mill for aluminum precision machining. Fixed column box frame, grblHAL 4-axis, 1kW water-cooled spindle. Full engineering proposal with BOM.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  --bg-card: #1c2128;
+  --bg-card-hover: #242a33;
+  --border: #30363d;
+  --border-light: #3d444d;
+  --text-primary: #c9d1d9;
+  --text-secondary: #8b949e;
+  --text-heading: #e6edf3;
+  --text-bright: #f0f6fc;
+  --accent-blue: #58a6ff;
+  --accent-green: #7ee787;
+  --accent-green-dim: #238636;
+  --accent-orange: #f0883e;
+  --accent-red: #f85149;
+  --accent-purple: #bc8cff;
+  --accent-yellow: #e3b341;
+  --accent-cyan: #79c0ff;
+  --accent-gold: #D4AF37;
+  --font-main: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.3);
+  --transition: 0.25s ease;
+  --container-max: 1200px;
+}
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-main); background: var(--bg-primary); color: var(--text-primary); line-height: 1.7; font-size: 16px; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+.container { max-width: var(--container-max); margin: 0 auto; padding: 0 24px; }
+h1, h2, h3, h4 { color: var(--text-heading); font-weight: 700; line-height: 1.3; }
+h1 { font-size: 2.8rem; letter-spacing: -0.02em; }
+h2 { font-size: 2rem; letter-spacing: -0.01em; }
+h3 { font-size: 1.4rem; }
+a { color: var(--accent-blue); text-decoration: none; transition: color var(--transition); }
+a:hover { text-decoration: underline; }
+strong { color: var(--text-heading); font-weight: 700; }
+.section { padding: 80px 0; border-bottom: 1px solid var(--border); }
+.section:last-child { border-bottom: none; }
+.section-label { display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent-blue); background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.25); padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+.section-label-green { display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent-green); background: rgba(126,231,135,0.1); border: 1px solid rgba(126,231,135,0.25); padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+.section-label-orange { display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent-orange); background: rgba(240,136,62,0.1); border: 1px solid rgba(240,136,62,0.25); padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+.section-label-purple { display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent-purple); background: rgba(188,140,255,0.1); border: 1px solid rgba(188,140,255,0.25); padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+.section-title { font-size: 2rem; margin-bottom: 12px; }
+.section-desc { color: var(--text-secondary); font-size: 1.05rem; max-width: 700px; margin-bottom: 40px; }
+.badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+.badge-green { color: var(--accent-green); background: rgba(126,231,135,0.12); border: 1px solid rgba(126,231,135,0.3); }
+.badge-blue { color: var(--accent-blue); background: rgba(88,166,255,0.12); border: 1px solid rgba(88,166,255,0.3); }
+.badge-orange { color: var(--accent-orange); background: rgba(240,136,62,0.12); border: 1px solid rgba(240,136,62,0.3); }
+.badge-red { color: var(--accent-red); background: rgba(248,81,73,0.12); border: 1px solid rgba(248,81,73,0.3); }
+.badge-purple { color: var(--accent-purple); background: rgba(188,140,255,0.12); border: 1px solid rgba(188,140,255,0.3); }
+.badge-cyan { color: var(--accent-cyan); background: rgba(121,192,255,0.12); border: 1px solid rgba(121,192,255,0.3); }
+.data-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+.data-table th { background: var(--bg-tertiary); color: var(--accent-blue); font-weight: 600; padding: 12px 16px; text-align: left; border: 1px solid var(--border); font-size: 13px; white-space: nowrap; }
+.data-table td { padding: 10px 16px; border: 1px solid var(--border); vertical-align: top; }
+.data-table tr:hover td { background: var(--bg-card-hover); }
+.data-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.data-table .center { text-align: center; }
+.data-table .highlight { color: var(--accent-blue); font-weight: 600; }
+.data-table .green { color: var(--accent-green); font-weight: 600; }
+.data-table .orange { color: var(--accent-orange); font-weight: 600; }
+.data-table .total-row td { background: var(--bg-tertiary); font-weight: 700; color: var(--text-heading); border-top: 2px solid var(--accent-blue); }
+.card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 32px 0; }
+.card-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin: 32px 0; }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 28px; transition: all var(--transition); }
+.card:hover { border-color: var(--accent-blue); box-shadow: 0 0 20px rgba(88,166,255,0.1); transform: translateY(-2px); }
+.card-icon { font-size: 2rem; margin-bottom: 12px; }
+.card h3 { font-size: 1.1rem; margin-bottom: 8px; }
+.card p { color: var(--text-secondary); font-size: 0.9rem; }
+.spec-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 24px 0; }
+.spec-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+.spec-label { color: var(--text-secondary); font-size: 0.9rem; }
+.spec-value { color: var(--accent-blue); font-weight: 600; font-size: 0.95rem; }
+.diagram-box { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 32px; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5; overflow-x: auto; white-space: pre; color: var(--text-primary); }
+.back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 24px; transition: color var(--transition); text-decoration: none; }
+.back-link:hover { color: var(--accent-blue); text-decoration: none; }
+.toc { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 28px 32px; margin: 32px 0; }
+.toc h3 { font-size: 1rem; color: var(--accent-blue); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.1em; }
+.toc ol { padding-left: 20px; }
+.toc li { margin-bottom: 8px; font-size: 0.95rem; }
+.toc a { color: var(--text-primary); }
+.toc a:hover { color: var(--accent-blue); text-decoration: none; }
+.timeline { position: relative; padding-left: 32px; margin: 32px 0; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+.timeline-item { position: relative; margin-bottom: 28px; }
+.timeline-dot { position: absolute; left: -28px; top: 6px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid; }
+.timeline-dot.blue { border-color: var(--accent-blue); background: rgba(88,166,255,0.3); }
+.timeline-dot.green { border-color: var(--accent-green); background: rgba(126,231,135,0.3); }
+.timeline-dot.orange { border-color: var(--accent-orange); background: rgba(240,136,62,0.3); }
+.timeline-dot.purple { border-color: var(--accent-purple); background: rgba(188,140,255,0.3); }
+.timeline-date { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px; }
+.timeline-title { font-weight: 700; color: var(--text-heading); margin-bottom: 4px; }
+.timeline-desc { font-size: 0.9rem; color: var(--text-secondary); }
+.product-header { background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 48px 40px; margin-bottom: 48px; position: relative; overflow: hidden; }
+.product-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--accent-green)); }
+.product-header h2 { font-size: 2.2rem; margin-bottom: 12px; }
+.product-header p { color: var(--text-secondary); font-size: 1.1rem; max-width: 600px; }
+.cost-summary { background: linear-gradient(135deg, rgba(88,166,255,0.08) 0%, rgba(126,231,135,0.08) 100%); border: 1px solid rgba(88,166,255,0.3); border-radius: var(--radius-lg); padding: 40px; margin: 40px 0; }
+.cost-summary h3 { color: var(--accent-blue); font-size: 1.8rem; margin-bottom: 24px; }
+.cost-big { font-size: 3.2rem; font-weight: 900; color: var(--accent-green); letter-spacing: -0.02em; }
+.cost-label { font-size: 1rem; color: var(--text-secondary); }
+.note-box { background: rgba(88,166,255,0.06); border-left: 3px solid var(--accent-blue); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 16px 20px; margin: 20px 0; font-size: 0.92rem; color: var(--text-secondary); }
+.note-box strong { color: var(--accent-blue); }
+.warn-box { background: rgba(240,136,62,0.06); border-left: 3px solid var(--accent-orange); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 16px 20px; margin: 20px 0; font-size: 0.92rem; color: var(--text-secondary); }
+.warn-box strong { color: var(--accent-orange); }
+.footer { padding: 60px 24px 40px; text-align: center; color: var(--text-secondary); font-size: 0.85rem; }
+.footer a { color: var(--accent-blue); }
+.divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-light), transparent); margin: 60px 0; }
+@media (max-width: 768px) {
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.5rem; }
+  .card-grid { grid-template-columns: 1fr; }
+  .card-grid-2 { grid-template-columns: 1fr; }
+  .spec-grid { grid-template-columns: 1fr; }
+  .section { padding: 48px 0; }
+  .data-table { font-size: 12px; }
+  .data-table th, .data-table td { padding: 8px 10px; }
+  .product-header { padding: 32px 24px; }
+  .product-header h2 { font-size: 1.6rem; }
+  .cost-big { font-size: 2.2rem; }
+  .diagram-box { font-size: 11px; padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div style="max-width:1200px; margin:0 auto;">
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section style="padding:100px 24px 60px; text-align:center;">
+  <a href="https://sy-baek.shop" class="back-link">&larr; sy-baek.shop</a>
+  <div style="margin-bottom:20px;">
+    <span class="badge badge-green">ENGINEERING PROPOSAL</span>
+    <span class="badge badge-blue">CNC MILLING</span>
+    <span class="badge badge-orange">2026-04</span>
+  </div>
+  <h1 style="margin-bottom:16px;"><span style="color:var(--accent-blue);">CNC-M200</span></h1>
+  <p style="color:var(--text-secondary); font-size:1.4rem; max-width:700px; margin:0 auto 12px; font-weight:600;">4-Axis Milling Machine</p>
+  <p style="color:var(--text-secondary); font-size:1.05rem; max-width:700px; margin:0 auto 32px;">
+    알루미늄 정밀가공을 위한 고정 컬럼 박스 프레임 구조.<br>
+    6061-T6 플레이트 볼트 조립. <span style="color:var(--accent-blue);">grblHAL 4축</span> 동시 보간. 1kW 수냉 스핀들.
+  </p>
+  <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+    <span class="badge badge-blue">grblHAL 4-Axis</span>
+    <span class="badge badge-green">1kW Spindle</span>
+    <span class="badge badge-orange">Aluminum Machining</span>
+    <span class="badge badge-cyan">Fusion 360 + CNCjs</span>
+  </div>
+</section>
+
+<!-- ============================================================
+     TOC
+     ============================================================ -->
+<section style="padding: 0 24px 40px;">
+  <div class="toc">
+    <h3>TABLE OF CONTENTS</h3>
+    <ol>
+      <li><a href="#p1-spec">사양 총괄</a></li>
+      <li><a href="#p1-frame">프레임 구조 설계</a></li>
+      <li><a href="#p1-linear">리니어 모션 시스템</a></li>
+      <li><a href="#p1-spindle">스핀들 시스템</a></li>
+      <li><a href="#p1-rotary">4축 로터리</a></li>
+      <li><a href="#p1-electronics">컨트롤러 + 전자부</a></li>
+      <li><a href="#p1-software">소프트웨어 스택</a></li>
+      <li><a href="#p1-bom">BOM + 원가</a></li>
+      <li><a href="#budget">예산 총괄</a></li>
+      <li><a href="#roadmap">개발 로드맵</a></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================
+     PRODUCT 1 — CNC MILLING MACHINE
+     ============================================================ -->
+<section class="section" id="p1">
+  <div class="container">
+
+    <div class="product-header">
+      <span class="badge badge-blue" style="margin-bottom:16px;">CNC-M200</span>
+      <h2>CNC-M200: 4-Axis Milling Machine</h2>
+      <p>고정 컬럼 박스 구조. 6061-T6 알루미늄 플레이트 볼트 조립. 금속 가공을 위한 최대 강성 설계.</p>
+    </div>
+
+    <!-- P1 - SPEC -->
+    <div id="p1-spec">
+      <span class="section-label">SPECIFICATIONS</span>
+      <h3 style="margin-bottom:24px;">사양 총괄</h3>
+
+      <div class="spec-grid">
+        <div class="spec-item"><span class="spec-label">작업 영역 (XYZ)</span><span class="spec-value">200 &times; 200 &times; 100mm</span></div>
+        <div class="spec-item"><span class="spec-label">4축 (A)</span><span class="spec-value">360&deg; 연속 회전</span></div>
+        <div class="spec-item"><span class="spec-label">스핀들</span><span class="spec-value">1kW 수냉 ER11</span></div>
+        <div class="spec-item"><span class="spec-label">RPM</span><span class="spec-value">0 ~ 24,000</span></div>
+        <div class="spec-item"><span class="spec-label">리니어 레일</span><span class="spec-value">HGR20 &times; 6</span></div>
+        <div class="spec-item"><span class="spec-label">볼스크류</span><span class="spec-value">SFU1605 (16mm, 5mm 리드)</span></div>
+        <div class="spec-item"><span class="spec-label">모터</span><span class="spec-value">NEMA23 3.0Nm &times; 4</span></div>
+        <div class="spec-item"><span class="spec-label">드라이버</span><span class="spec-value">DM556 &times; 4</span></div>
+        <div class="spec-item"><span class="spec-label">컨트롤러</span><span class="spec-value">grblHAL (STM32F446)</span></div>
+        <div class="spec-item"><span class="spec-label">해상도</span><span class="spec-value">0.00156mm (1.56&micro;m)</span></div>
+        <div class="spec-item"><span class="spec-label">프레임</span><span class="spec-value">6061-T6, 20~25mm 플레이트</span></div>
+        <div class="spec-item"><span class="spec-label">총 중량</span><span class="spec-value">~76 kg</span></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- P1 - FRAME -->
+    <div id="p1-frame">
+      <span class="section-label">FRAME DESIGN</span>
+      <h3 style="margin-bottom:12px;">프레임 구조 설계</h3>
+      <p class="section-desc">고정 컬럼 박스 구조(Fixed Column Box). 상용 벤치탑 밀(Tormach PCNC440, Sieg X2)과 동일한 토폴로지. 금속 절삭의 횡력(50~200N)을 최단 경로로 전달.</p>
+
+      <div class="note-box">
+        <strong>설계 원칙:</strong> 무게 = 강성 = 정밀도. 76kg 목표 중량은 Sieg X2(73kg)와 동급. 모든 직각 접합부에 거셋 삼각 보강. 최대 비지지 스팬 200mm 제한.
+      </div>
+
+      <h4 style="margin:32px 0 16px; color:var(--accent-blue);">플레이트 명세</h4>
+      <table class="data-table">
+        <thead>
+          <tr><th>번호</th><th>명칭</th><th>치수 (W&times;H&times;T)</th><th>재질</th><th class="num">중량</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="highlight">P1</td><td>베이스 플레이트</td><td>500 &times; 400 &times; 25mm</td><td>6061-T6</td><td class="num">13.5 kg</td></tr>
+          <tr><td class="highlight">P2</td><td>컬럼 뒷판</td><td>300 &times; 400 &times; 20mm</td><td>6061-T6</td><td class="num">6.5 kg</td></tr>
+          <tr><td class="highlight">P3L/R</td><td>컬럼 좌/우판 (&times;2)</td><td>200 &times; 400 &times; 20mm</td><td>6061-T6</td><td class="num">8.6 kg</td></tr>
+          <tr><td class="highlight">P4</td><td>컬럼 상판 캡</td><td>300 &times; 200 &times; 20mm</td><td>6061-T6</td><td class="num">3.2 kg</td></tr>
+          <tr><td class="highlight">P5</td><td>Z축 캐리지</td><td>250 &times; 250 &times; 20mm</td><td>6061-T6</td><td class="num">3.4 kg</td></tr>
+          <tr><td class="highlight">P6</td><td>스핀들 마운트</td><td>150 &times; 200 &times; 25mm</td><td>6061-T6</td><td class="num">2.0 kg</td></tr>
+          <tr><td class="highlight">P7</td><td>Y축 새들</td><td>350 &times; 300 &times; 20mm</td><td>6061-T6</td><td class="num">5.7 kg</td></tr>
+          <tr><td class="highlight">P8</td><td>X축 테이블</td><td>350 &times; 250 &times; 20mm</td><td>6061-T6</td><td class="num">4.7 kg</td></tr>
+          <tr><td class="highlight">P9</td><td>T-슬롯 서브플레이트</td><td>250 &times; 250 &times; 20mm</td><td>6061-T6</td><td class="num">3.4 kg</td></tr>
+          <tr><td class="highlight">G1~6</td><td>거셋 보강판 (&times;6)</td><td>100~150 &times; 15mm</td><td>6061-T6</td><td class="num">3.0 kg</td></tr>
+          <tr class="total-row"><td colspan="4">플레이트 합계</td><td class="num">~54 kg</td></tr>
+        </tbody>
+      </table>
+
+      <h4 style="margin:32px 0 16px; color:var(--accent-blue);">구조 다이어그램</h4>
+      <div class="diagram-box">                        [Z Motor]
+                 ___________________
+                |   P4 (Top Cap)   |
+    ____________|___________________|____________
+    |   P3L    ||       P2         ||   P3R    |
+    |  Left    ||   Column Back    ||  Right   |
+    |  20mm    ||   Z-Rails Here   ||  20mm    |
+    |          ||    ┌───────┐     ||          |
+    |  /G5/    ||    |  P5   |     ||   \G6\   |
+    |          ||    | Z-Car |     ||          |
+    |          ||    |  P6   |     ||          |
+    |__________||| [SPINDLE]  |||__________|
+    ===============================================
+    |          P1  BASE  500x400x25mm             |
+    ===============================================
+           Y-Rails (HGR20 x2, 200mm apart)
+                    |
+             [P7 SADDLE] ← Y방향 이동
+           X-Rails (HGR20 x2, 150mm apart)
+                    |
+             [P8 TABLE] ← X방향 이동
+                    |
+              [P9 T-SLOT] ← 작업면
+</div>
+
+      <h4 style="margin:32px 0 16px; color:var(--accent-blue);">강성 검증</h4>
+      <div class="card-grid-2">
+        <div class="card">
+          <h3 style="color:var(--accent-green);">컬럼 변위 검증</h3>
+          <p>100N 횡력 @ 300mm 지점</p>
+          <p style="margin-top:8px;">박스 단면 I = 215,653,333 mm<sup>4</sup></p>
+          <p style="color:var(--accent-green); font-weight:700; font-size:1.3rem; margin-top:8px;">0.06 &micro;m</p>
+          <p style="color:var(--text-secondary); font-size:0.85rem;">허용치 10&micro;m 대비 167배 여유</p>
+        </div>
+        <div class="card">
+          <h3 style="color:var(--accent-green);">베이스 변위 검증</h3>
+          <p>245N (25kg) 분포하중, 200mm 스팬</p>
+          <p style="margin-top:8px;">25mm 플레이트 I = 520,833 mm<sup>4</sup></p>
+          <p style="color:var(--accent-green); font-weight:700; font-size:1.3rem; margin-top:8px;">0.7 &micro;m</p>
+          <p style="color:var(--text-secondary); font-size:0.85rem;">허용치 10&micro;m 대비 14배 여유</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- P1 - LINEAR -->
+    <div id="p1-linear">
+      <span class="section-label">LINEAR MOTION</span>
+      <h3 style="margin-bottom:12px;">리니어 모션 시스템</h3>
+      <p class="section-desc">HGR20 리니어 레일 + SFU1605 볼스크류. 블록당 25kN 동적 하중 &mdash; 알루미늄 가공에 충분한 강성.</p>
+
+      <table class="data-table">
+        <thead><tr><th>축</th><th>레일</th><th>길이</th><th>수량</th><th>블록</th><th>레일 간격</th><th>볼스크류</th><th>베어링</th></tr></thead>
+        <tbody>
+          <tr><td class="highlight">X</td><td>HGR20</td><td>500mm</td><td class="center">2</td><td>HGH20CA &times;4</td><td class="center">150mm</td><td>SFU1605 400mm</td><td>BK12 + BF12</td></tr>
+          <tr><td class="highlight">Y</td><td>HGR20</td><td>450mm</td><td class="center">2</td><td>HGH20CA &times;4</td><td class="center">200mm</td><td>SFU1605 350mm</td><td>BK12 + BF12</td></tr>
+          <tr><td class="highlight">Z</td><td>HGR20</td><td>350mm</td><td class="center">2</td><td>HGH20CA &times;4</td><td class="center">150mm</td><td>SFU1605 250mm</td><td>BK12 + BF12</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note-box">
+        <strong>해상도:</strong> (200step &times; 16&micro;step) / 5mm = <strong>640 steps/mm = 1.56&micro;m/step</strong>. 알루미늄 일반 공차 &plusmn;0.05mm 대비 32배 정밀.
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- P1 - SPINDLE -->
+    <div id="p1-spindle">
+      <span class="section-label">SPINDLE SYSTEM</span>
+      <h3 style="margin-bottom:12px;">스핀들 시스템</h3>
+      <p class="section-desc">1kW 수냉 브러시리스 스핀들. 소형 알루미늄 부품(손바닥 이하)에 최적화된 출력.</p>
+
+      <div class="spec-grid">
+        <div class="spec-item"><span class="spec-label">출력</span><span class="spec-value">1kW (연속)</span></div>
+        <div class="spec-item"><span class="spec-label">RPM 범위</span><span class="spec-value">3,000 ~ 24,000</span></div>
+        <div class="spec-item"><span class="spec-label">직경</span><span class="spec-value">65mm</span></div>
+        <div class="spec-item"><span class="spec-label">콜렛</span><span class="spec-value">ER11 (max &empty;7mm)</span></div>
+        <div class="spec-item"><span class="spec-label">냉각</span><span class="spec-value">수냉 (펌프 + 물통)</span></div>
+        <div class="spec-item"><span class="spec-label">VFD</span><span class="spec-value">1.5kW (150% 여유)</span></div>
+      </div>
+
+      <h4 style="margin:32px 0 16px; color:var(--accent-blue);">소재별 가공 능력</h4>
+      <table class="data-table">
+        <thead><tr><th>소재</th><th>절입 깊이</th><th>엔드밀</th><th>이송속도</th><th>평가</th></tr></thead>
+        <tbody>
+          <tr><td>알루미늄 6061</td><td>1~3mm</td><td>&empty;6 2날</td><td>500~1,500 mm/min</td><td class="green">쾌적</td></tr>
+          <tr><td>황동</td><td>1~2mm</td><td>&empty;6 2날</td><td>300~800 mm/min</td><td class="green">양호</td></tr>
+          <tr><td>PVC / ABS / 아크릴</td><td>2~5mm</td><td>&empty;4 1날</td><td>1,000~3,000 mm/min</td><td class="green">여유</td></tr>
+          <tr><td>연강 (SS400)</td><td>0.3~1mm</td><td>&empty;4 4날</td><td>200~500 mm/min</td><td class="orange">가능 (느림)</td></tr>
+          <tr><td>PCB (FR4)</td><td>관통</td><td>V-bit</td><td>특수</td><td class="green">여유</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- P1 - ROTARY -->
+    <div id="p1-rotary">
+      <span class="section-label">4TH AXIS ROTARY</span>
+      <h3 style="margin-bottom:12px;">4축 로터리 시스템</h3>
+      <p class="section-desc">K11-100 3jaw 척 + 90:1 웜기어. 원통 내/외경 가공, 다면 인덱싱, 샤프트 커플링 제작.</p>
+
+      <div class="spec-grid">
+        <div class="spec-item"><span class="spec-label">척</span><span class="spec-value">K11-100 3jaw (자동센터링)</span></div>
+        <div class="spec-item"><span class="spec-label">감속비</span><span class="spec-value">90:1 (웜기어, 셀프록킹)</span></div>
+        <div class="spec-item"><span class="spec-label">모터</span><span class="spec-value">NEMA23 3.0Nm</span></div>
+        <div class="spec-item"><span class="spec-label">해상도</span><span class="spec-value">800 steps/deg (0.00125&deg;)</span></div>
+        <div class="spec-item"><span class="spec-label">심압대</span><span class="spec-value">MT2 테이퍼, 65mm 중심높이</span></div>
+        <div class="spec-item"><span class="spec-label">최대 회전속도</span><span class="spec-value">10 RPM</span></div>
+      </div>
+
+      <h4 style="margin:32px 0 16px; color:var(--accent-blue);">활용 예시: 샤프트 커플링 가공</h4>
+      <div class="diagram-box">예: &empty;8 샤프트 &harr; &empty;12 샤프트 연결 커플링
+
+1. &empty;20 알루미늄 원봉 &rarr; A축 척에 장착
+2. 한쪽: &empty;8 보어 (내경 밀링)    [스핀들]
+3. 반대쪽: &empty;12 보어              ↓
+4. A축 90&deg; 회전 &rarr; 세트스크류 홀   ========○========
+5. 외경 절삭: 원하는 외경으로 가공        [척]      [심압대]</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- P1 - ELECTRONICS -->
+    <div id="p1-electronics">
+      <span class="section-label">ELECTRONICS</span>
+      <h3 style="margin-bottom:12px;">컨트롤러 + 전자부</h3>
+      <p class="section-desc">grblHAL on STM32F446. 4축 동시 보간. DM556 &times; 4 외부 드라이버. 48V/24V/5V 3단 전원 구성.</p>
+
+      <h4 style="margin:24px 0 16px; color:var(--accent-blue);">시스템 블록도</h4>
+      <div class="diagram-box">AC 220V &rarr; [E-STOP NC] &rarr; [CONTACTOR]
+                                  |
+              ┌───────────────────┼───────────────────┐
+              |                   |                   |
+        ┌─────┴─────┐      ┌─────┴─────┐      ┌─────┴─────┐
+        | 48V PSU   |      | 24V PSU   |      |   VFD     |
+        | 750W      |      | 60W       |      |  1.5kW    |
+        └─────┬─────┘      └─────┬─────┘      └─────┬─────┘
+              |                   |                   |
+         4x DM556          NPN Sensors          1kW Spindle
+         4x NEMA23         Relays, Fans         (3-Phase)
+              |                   |
+              |              ┌────┴────┐
+              |              | 5V Buck |
+              |              └────┬────┘
+              |                   |
+         ┌────┴───────────────────┴────┐
+         |      STM32F446 (grblHAL)    |
+         |  USB &harr; PC (CNCjs/UGS)       |
+         └─────────────────────────────┘</div>
+
+      <h4 style="margin:32px 0 16px; color:var(--accent-blue);">핀 할당표</h4>
+      <table class="data-table">
+        <thead><tr><th>기능</th><th>핀</th><th>연결</th><th>비고</th></tr></thead>
+        <tbody>
+          <tr><td>X_STEP / X_DIR</td><td class="highlight">PA0 / PA1</td><td>DM556 #1 PUL+ / DIR+</td><td>330&ohm; &rarr; 74HCT245</td></tr>
+          <tr><td>Y_STEP / Y_DIR</td><td class="highlight">PA2 / PA3</td><td>DM556 #2</td><td></td></tr>
+          <tr><td>Z_STEP / Z_DIR</td><td class="highlight">PA4 / PA5</td><td>DM556 #3</td><td></td></tr>
+          <tr><td>A_STEP / A_DIR</td><td class="highlight">PA6 / PA7</td><td>DM556 #4</td><td></td></tr>
+          <tr><td>ENABLE (ALL)</td><td class="highlight">PB12</td><td>All DM556 ENA+</td><td>Active LOW</td></tr>
+          <tr><td>SPINDLE PWM</td><td class="highlight">PA8</td><td>PWM&rarr;0-10V &rarr; VFD AI1</td><td>변환 모듈 사용</td></tr>
+          <tr><td>LIMITS (X~A)</td><td class="highlight">PB0~PB6</td><td>NPN 근접센서 &times;7</td><td>NC 로직, 풀업</td></tr>
+          <tr><td>PROBE</td><td class="highlight">PB7</td><td>터치 플레이트</td><td>공구 길이 측정</td></tr>
+          <tr><td>E-STOP</td><td class="highlight">PB8</td><td>비상정지 NC 접점</td><td>하드웨어 콘택터 병행</td></tr>
+          <tr><td>COOLANT</td><td class="highlight">PB10/11</td><td>SSR &rarr; 쿨런트/미스트</td><td>M7/M8 G-code</td></tr>
+        </tbody>
+      </table>
+
+      <div class="warn-box">
+        <strong>레벨 시프터 필수:</strong> STM32 (3.3V) &rarr; 74HCT245 &rarr; DM556 (5V 옵토커플러). 3.3V 직결 시 구동 전류 부족으로 신호 불안정.
+      </div>
+
+      <h4 style="margin:32px 0 16px; color:var(--accent-blue);">DM556 DIP 스위치 설정</h4>
+      <table class="data-table">
+        <thead><tr><th>축</th><th>전류 (피크)</th><th>SW1</th><th>SW2</th><th>SW3</th><th>마이크로스텝</th><th>Steps/Rev</th></tr></thead>
+        <tbody>
+          <tr><td class="highlight">X</td><td>4.5A</td><td>ON</td><td>OFF</td><td>OFF</td><td>1/16</td><td class="num">3,200</td></tr>
+          <tr><td class="highlight">Y</td><td>5.0A</td><td>OFF</td><td>ON</td><td>OFF</td><td>1/16</td><td class="num">3,200</td></tr>
+          <tr><td class="highlight">Z</td><td>5.0A</td><td>OFF</td><td>ON</td><td>OFF</td><td>1/16</td><td class="num">3,200</td></tr>
+          <tr><td class="highlight">A</td><td>4.0A</td><td>ON</td><td>ON</td><td>OFF</td><td>1/16</td><td class="num">3,200</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- P1 - SOFTWARE -->
+    <div id="p1-software">
+      <span class="section-label-purple">SOFTWARE STACK</span>
+      <h3 style="margin-bottom:12px;">소프트웨어 스택</h3>
+      <p class="section-desc">오픈소스 기반 풀스택. 설계부터 가공까지 제로 라이선스 비용.</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">&#9997;</div>
+          <h3>CAD: Fusion 360</h3>
+          <p>3D 모델링, 개인용 무료. 4축 CAM 포함. 알루미늄 적응형 클리어링.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#9881;</div>
+          <h3>펌웨어: grblHAL</h3>
+          <p>STM32F446. 4축 XYZA, VFD Modbus, 프로빙, 공구 테이블. 액티브 개발.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128187;</div>
+          <h3>G-code: CNCjs</h3>
+          <p>Raspberry Pi 웹 UI. 4축 DRO, 매크로, 원격 접속. Node.js 기반.</p>
+        </div>
+      </div>
+
+      <h4 style="margin:32px 0 16px; color:var(--accent-blue);">grblHAL 핵심 파라미터</h4>
+      <div class="diagram-box">$100=640    ; X steps/mm (SFU1605 + 1/16 microstep)
+$101=640    ; Y steps/mm
+$102=640    ; Z steps/mm
+$103=800    ; A steps/degree (90:1 worm gear)
+
+$110=4000   ; X max rate (mm/min)
+$111=4000   ; Y max rate
+$112=2000   ; Z max rate
+$113=3600   ; A max rate (deg/min) = 10 RPM
+
+$120=200    ; X acceleration (mm/sec&sup2;)
+$121=200    ; Y acceleration
+$122=100    ; Z acceleration
+$123=30     ; A acceleration (deg/sec&sup2;)
+
+$22=1       ; Homing enable
+$30=24000   ; Max spindle RPM
+$1=255      ; Step idle = always ON (hold position)</div>
+
+      <h4 style="margin:32px 0 16px; color:var(--accent-blue);">워크플로우</h4>
+      <div class="diagram-box">Fusion 360 CAD  &rarr;  Fusion 360 CAM  &rarr;  grbl Post  &rarr;  .gcode
+                            (Toolpath)     (Processor)      |
+                                                             &darr;
+   Monitor &larr; CNCjs (Web UI) &larr; USB Serial &larr; grblHAL (STM32)
+     Feed Override                Raspberry Pi         4x DM556
+     Spindle Control              Port 8000            4x NEMA23</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- PRICE LOCK GATE -->
+    <div id="lock-gate" style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); padding:48px 40px; text-align:center; margin:40px 0;">
+      <div style="font-size:3rem; margin-bottom:16px; opacity:0.6;">&#128274;</div>
+      <h3 style="margin-bottom:8px; color:var(--text-heading);">Restricted Section</h3>
+      <p style="color:var(--text-secondary); margin-bottom:24px; font-size:0.95rem;">BOM 및 예산 정보는 비공개입니다.</p>
+      <div style="display:inline-flex; gap:8px; align-items:center;">
+        <input type="password" id="lock-pw" placeholder="Password" style="background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 16px; color:var(--text-primary); font-size:14px; width:180px; outline:none; font-family:var(--font-main);" onfocus="this.style.borderColor='var(--accent-blue)'" onblur="this.style.borderColor='var(--border)'">
+        <button onclick="unlock()" style="background:var(--accent-blue); color:#fff; border:none; border-radius:var(--radius-sm); padding:10px 20px; font-size:14px; font-weight:600; cursor:pointer; font-family:var(--font-main); transition:background 0.2s;" onmouseover="this.style.background='#79c0ff'" onmouseout="this.style.background='var(--accent-blue)'">Unlock</button>
+      </div>
+      <p id="lock-err" style="color:var(--accent-red); margin-top:12px; font-size:0.85rem; display:none;">Incorrect password.</p>
+      <p style="margin-top:20px;"><a href="/cnc-milling-bom.html" style="color:var(--accent-blue); font-size:0.9rem;">&#128196; 전체 부품 목록 (Parts List) &rarr;</a></p>
+    </div>
+
+    <!-- P1 - BOM (LOCKED) -->
+    <div id="p1-bom" data-locked style="display:none">
+      <span class="section-label-green">BILL OF MATERIALS</span>
+      <h3 style="margin-bottom:24px;">CNC-M200 BOM + 원가</h3>
+
+      <table class="data-table">
+        <thead><tr><th>카테고리</th><th>항목</th><th class="center">수량</th><th class="num">단가 (&#8361;)</th><th class="num">소계 (&#8361;)</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="5" style="font-weight:700; color:var(--accent-blue); vertical-align:middle;">A. 기구부</td><td>6061-T6 알루미늄 플레이트 (~54kg)</td><td class="center">12매</td><td class="num">-</td><td class="num">450,000</td></tr>
+          <tr><td>T-슬롯 테이블 250&times;250</td><td class="center">1</td><td class="num">60,000</td><td class="num">60,000</td></tr>
+          <tr><td>볼트/나사 (M5~M10)</td><td class="center">lot</td><td class="num">-</td><td class="num">50,000</td></tr>
+          <tr><td>다웰핀 (6mm, 8mm)</td><td class="center">20</td><td class="num">-</td><td class="num">10,000</td></tr>
+          <tr><td>방진 레벨링 발</td><td class="center">4</td><td class="num">5,000</td><td class="num">20,000</td></tr>
+
+          <tr><td rowspan="4" style="font-weight:700; color:var(--accent-blue); vertical-align:middle;">B. 리니어</td><td>HGR20 레일 (500+450+350mm)</td><td class="center">6</td><td class="num">~23,000</td><td class="num">136,000</td></tr>
+          <tr><td>HGH20CA 블록</td><td class="center">12</td><td class="num">12,000</td><td class="num">144,000</td></tr>
+          <tr><td>SFU1605 볼스크류 + BK/BF12</td><td class="center">3 set</td><td class="num">-</td><td class="num">119,000</td></tr>
+          <tr><td>커플링 + 너트하우징</td><td class="center">3</td><td class="num">-</td><td class="num">33,000</td></tr>
+
+          <tr><td rowspan="4" style="font-weight:700; color:var(--accent-blue); vertical-align:middle;">C. 스핀들</td><td>1kW 수냉 ER11 (65mm)</td><td class="center">1</td><td class="num">130,000</td><td class="num">130,000</td></tr>
+          <tr><td>1.5kW VFD (Huanyang)</td><td class="center">1</td><td class="num">90,000</td><td class="num">90,000</td></tr>
+          <tr><td>수냉킷 (펌프+튜브+물통)</td><td class="center">1</td><td class="num">-</td><td class="num">41,000</td></tr>
+          <tr><td>65mm 클램프 + ER11 풀세트</td><td class="center">1</td><td class="num">-</td><td class="num">53,000</td></tr>
+
+          <tr><td rowspan="3" style="font-weight:700; color:var(--accent-blue); vertical-align:middle;">D. 4축</td><td>로터리 헤드 (K11-100, 90:1)</td><td class="center">1</td><td class="num">250,000</td><td class="num">250,000</td></tr>
+          <tr><td>NEMA23 A축 모터</td><td class="center">1</td><td class="num">35,000</td><td class="num">35,000</td></tr>
+          <tr><td>심압대 (MT2, 65mm)</td><td class="center">1</td><td class="num">90,000</td><td class="num">90,000</td></tr>
+
+          <tr><td rowspan="3" style="font-weight:700; color:var(--accent-blue); vertical-align:middle;">E. 전동부</td><td>NEMA23 3.0Nm (XYZ)</td><td class="center">3</td><td class="num">35,000</td><td class="num">105,000</td></tr>
+          <tr><td>DM556 드라이버</td><td class="center">4</td><td class="num">25,000</td><td class="num">100,000</td></tr>
+          <tr><td>PSU (48V 750W + 24V 60W)</td><td class="center">2</td><td class="num">-</td><td class="num">150,000</td></tr>
+
+          <tr><td rowspan="2" style="font-weight:700; color:var(--accent-blue); vertical-align:middle;">F. 전자부</td><td>grblHAL 보드 + 센서 + 릴레이</td><td class="center">lot</td><td class="num">-</td><td class="num">166,500</td></tr>
+          <tr><td>배선 (케이블체인 + 커넥터 등)</td><td class="center">lot</td><td class="num">-</td><td class="num">150,000</td></tr>
+
+          <tr><td style="font-weight:700; color:var(--accent-blue);">G. 공구</td><td>바이스 + 엔드밀 + 계측기구 등</td><td class="center">lot</td><td class="num">-</td><td class="num">399,000</td></tr>
+
+          <tr class="total-row"><td colspan="4">CNC-M200 총 원가</td><td class="num" style="font-size:1.1rem;">&#8361;2,763,500</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     BUDGET SUMMARY
+     ============================================================ -->
+<section class="section" id="budget" data-locked style="display:none">
+  <div class="container">
+    <span class="section-label-orange">TOTAL BUDGET</span>
+    <h2 class="section-title">예산 총괄</h2>
+
+    <div class="cost-summary">
+      <div style="text-align:center;">
+        <div class="cost-label">CNC-M200 총 원가</div>
+        <div class="cost-big" style="color:var(--accent-blue);">&#8361;2,763,500</div>
+        <div class="cost-label" style="margin-top:4px;">~$2,000 USD</div>
+      </div>
+    </div>
+
+    <h4 style="margin:32px 0 16px; color:var(--accent-orange);">카테고리별 비용 구성</h4>
+    <table class="data-table">
+      <thead><tr><th>카테고리</th><th>내역</th><th class="num">금액 (&#8361;)</th><th class="num">비율</th></tr></thead>
+      <tbody>
+        <tr><td class="highlight">A. 기구부</td><td>알루미늄 플레이트, T-슬롯, 볼트, 다웰핀, 레벨링 발</td><td class="num">590,000</td><td class="num">21.4%</td></tr>
+        <tr><td class="highlight">B. 리니어</td><td>HGR20 레일, HGH20CA 블록, SFU1605 볼스크류, 커플링</td><td class="num">414,000</td><td class="num">15.0%</td></tr>
+        <tr><td class="highlight">C. 스핀들</td><td>1kW 수냉 스핀들, VFD, 수냉킷, 클램프+콜렛</td><td class="num">314,000</td><td class="num">11.4%</td></tr>
+        <tr><td class="highlight">D. 4축</td><td>로터리 헤드, A축 모터, 심압대</td><td class="num">375,000</td><td class="num">13.6%</td></tr>
+        <tr><td class="highlight">E. 전동부</td><td>NEMA23 모터, DM556 드라이버, PSU</td><td class="num">355,000</td><td class="num">12.8%</td></tr>
+        <tr><td class="highlight">F. 전자부</td><td>grblHAL 보드, 센서, 릴레이, 배선</td><td class="num">316,500</td><td class="num">11.5%</td></tr>
+        <tr><td class="highlight">G. 공구</td><td>바이스, 엔드밀, 계측기구</td><td class="num">399,000</td><td class="num">14.4%</td></tr>
+        <tr class="total-row"><td colspan="2">TOTAL</td><td class="num" style="font-size:1.1rem;">&#8361;2,763,500</td><td class="num">100%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note-box">
+      <strong>구매 전략:</strong> AliExpress 직구 시 국내 대비 30~50% 절감. 모터+드라이버 4세트 번들 구매 시 추가 15% 할인. Mean Well PSU는 국내 정품 구매 권장 (노이즈/안정성).
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ROADMAP
+     ============================================================ -->
+<section class="section" id="roadmap">
+  <div class="container">
+    <span class="section-label-purple">DEVELOPMENT ROADMAP</span>
+    <h2 class="section-title">개발 로드맵</h2>
+    <p class="section-desc">부품 조달부터 첫 가공까지의 마일스톤.</p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot blue"></div>
+        <div class="timeline-date">Phase 1</div>
+        <div class="timeline-title">부품 조달 + BOM 확정</div>
+        <div class="timeline-desc">AliExpress 주문 (2~3주 배송). 알루미늄 플레이트 국내 절단 발주. 리니어 레일/볼스크류 세트 번들 주문.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot blue"></div>
+        <div class="timeline-date">Phase 2</div>
+        <div class="timeline-title">프레임 가공 + 조립</div>
+        <div class="timeline-desc">플레이트 면삭, 볼트홀/다웰핀홀 가공. 베이스 &rarr; 컬럼 박스 &rarr; Z축 &rarr; 테이블 순차 조립.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot green"></div>
+        <div class="timeline-date">Phase 3</div>
+        <div class="timeline-title">전자부 + 펌웨어</div>
+        <div class="timeline-desc">DIN레일 전장함 조립. grblHAL 플래시 + 파라미터 설정. DM556 전류/마이크로스텝 세팅. 호밍 테스트.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot green"></div>
+        <div class="timeline-date">Phase 4</div>
+        <div class="timeline-title">캘리브레이션 + 첫 가공</div>
+        <div class="timeline-desc">트래밍 (다이얼 인디케이터). 알루미늄 테스트컷. 4축 로터리 정렬. 공구 길이 프로빙 매크로.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot orange"></div>
+        <div class="timeline-date">Phase 5</div>
+        <div class="timeline-title">인클로저 + 최적화</div>
+        <div class="timeline-desc">폴리카보네이트 안전 인클로저. MQL 미스트 시스템. CNCjs 대시보드 커스텀. 운영 안정화.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<div class="footer">
+  <p style="margin-bottom:12px;">
+    <a href="/pcb-drill.html">다른 프로젝트: PCB-D300 자동 드릴링 &rarr;</a>
+  </p>
+  <p style="margin-bottom:8px;">
+    <a href="https://sy-baek.shop">&larr; sy-baek.shop</a>
+  </p>
+  <p>CNC-M200: 4-Axis Milling Machine &mdash; Engineering Proposal v1.0</p>
+  <p>&copy; 2026 SY-BAEK Engineering. All rights reserved.</p>
+</div>
+
+</div>
+<script>
+function unlock(){var p=document.getElementById('lock-pw');if(p.value==='seung'){document.querySelectorAll('[data-locked]').forEach(function(el){el.style.display='';});document.getElementById('lock-gate').style.display='none';}else{document.getElementById('lock-err').style.display='block';p.value='';p.focus();}}
+document.getElementById('lock-pw').addEventListener('keydown',function(e){if(e.key==='Enter')unlock();});
+</script>
+</body>
+</html>
